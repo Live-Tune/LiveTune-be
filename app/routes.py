@@ -3,7 +3,15 @@ app = Flask(__name__)
 
 rooms = {}
 
-
+@app.route('/api/room/getid', methods=['GET']) 
+def get_room_id():           
+    room_title = request.args.get('title')
+    for room_id, room_data in rooms.items():
+        if room_data.get("title") == room_title:
+            return jsonify({"id": room_id})
+    
+    return jsonify({"error": "Room not found"}), 404
+    
 @app.route('/api/room/info', methods=['GET'])
 def get_room_info():
     room_id = request.args.get('id')
