@@ -17,20 +17,26 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, description, maxUser, owner]
+              required: [room_name, is_room_private, room_description, room_maxUser, room_host, room_id]
               properties:
-                name:
+                room_name:
                   type: string
                   example: Chill Room
-                description:
+                is_room_private: 
+                  type: boolean
+                  example: False
+                room_description:
                   type: string
                   example: A room for relaxing music
-                maxUser:
+                room_maxUser:
                   type: integer
                   example: 10
-                owner:
+                room_host:
                   type: string
                   example: alice
+                room_id:
+                  type: integer
+                  example: 3
       responses:
         '200':
           description: Room created successfully
@@ -46,16 +52,20 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, description, maxUser, owner]
+              required: [new_room_name, new_room_description, new_room_maxUser, new_room_host]
               properties:
-                name:
+                new_room_name:
                   type: string
-                description:
+                  example: Lo-Fi Room
+                new_room_description:
                   type: string
-                maxUser:
+                  example: A room for lo-fi music
+                new_room_maxUser:
                   type: integer
-                owner:
+                  example: 5
+                new_room_host:
                   type: string
+                  example: "kevin"
       responses:
         '200':
           description: Room updated successfully
