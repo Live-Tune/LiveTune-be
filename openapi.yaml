@@ -126,11 +126,11 @@ paths:
       summary: Get internal room ID
       parameters:
         - in: query
-          name: id
+          name: name
           schema:
             type: string
           required: true
-          example: abc123
+          example: Chill Room
       responses:
         '200':
           description: Room ID returned
@@ -139,9 +139,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  roomid:
-                    type: string
-                    example: abc123
+                  room_id:
+                    type: integer
+                    example: 3
         '404':
           description: Room not found
 
@@ -184,7 +184,7 @@ paths:
           required: true
           schema:
             type: string
-          example: abc123
+          example: 1
       responses:
         '200':
           description: Current queue returned
