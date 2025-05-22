@@ -35,6 +35,25 @@ def createroom():
 
     return "Room created successfully.", 201
 
+
+# Update room settings
+@app.route("/api/room/updatesettings", methods=["PUT"])
+def updatesettings():
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON data"}), 400
+    
+    new_room_name = data.get('new_room_name')
+    new_room_description = data.get('new_room_description')
+    new_room_maxUser = data.get('new_room_maxUser')
+    new_room_host = data.get('new_room_host')
+    room_id = data.get('room_id')
+
+    rooms[room_id].update_settings(new_room_name, new_room_description, new_room_maxUser, new_room_host)
+
+    return "Room updated successfully.", 201
+
 # TEST  
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
