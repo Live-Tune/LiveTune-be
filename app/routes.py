@@ -67,6 +67,19 @@ def getpublicrooms():
 
     return jsonify(public_rooms_data), 200
 
+@app.route("/api/room/deleteroom", methods=["DELETE"])
+def deleteroom():
+
+    data = request.get_json()
+    delete_room_id = data.get('delete_room_id')
+
+    if delete_room_id in rooms:
+        del rooms[delete_room_id]
+        return "Room deleted successfully.", 200
+    else:
+        return "Room not found.", 404
+
+
 # TEST  
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
