@@ -54,6 +54,19 @@ def updatesettings():
 
     return "Room updated successfully.", 201
 
+# Retrieve available public rooms
+@app.route("/api/room/availablepublicrooms", methods=["GET"])
+def getpublicrooms():
+
+    public_rooms_data = []
+    for room_id, room_obj in rooms.items():
+        if not room_obj.isprivate:
+            # 일단 I will return the whole object but I think we should
+            # only return a couple properties
+            public_rooms_data.append(room_obj.to_dict())
+
+    return jsonify(public_rooms_data), 200
+
 # TEST  
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
