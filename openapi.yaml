@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: LiveTune API
+  version: 1.0.0
+  description: API for managing music streaming rooms.
+
+servers:
+  - url: https://api.livetune.app
+
+paths:
+  /api/room/createnew:
+    post:
+      summary: Create a new room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [room_name, is_room_private, room_description, room_maxUser, room_host, room_id]
+              properties:
+                room_name:
+                  type: string
+                  example: Chill Room
+                is_room_private: 
+                  type: boolean
+                  example: False
+                room_description:
+                  type: string
+                  example: A room for relaxing music
+                room_maxUser:
+                  type: integer
+                  example: 10
+                room_host:
+                  type: string
+                  example: alice
+                room_id:
+                  type: integer
+                  example: 3
+      responses:
+        '200':
+          description: Room created successfully
+        '400':
+          description: Invalid input
+
+  /api/room/updatesettings:
+    put:
+      summary: Update room settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [new_room_name, new_room_description, new_room_maxUser, new_room_host]
+              properties:
+                new_room_name:
+                  type: string
+                  example: Lo-Fi Room
+                new_room_description:
+                  type: string
+                  example: A room for lo-fi music
+                new_room_maxUser:
+                  type: integer
+                  example: 5
+                new_room_host:
+                  type: string
+                  example: "kevin"
+      responses:
+        '200':
+          description: Room updated successfully
+        '400':
+          description: Invalid input
+
+  /api/room/availablepublicrooms:
+    get:
+      summary: Get a list of all public rooms
+      responses:
+        '200':
+          description: List of public rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: abc123
+                    name:
+                      type: string
+                      example: Chill Room
+                    description:
+                      type: string
+                      example: Public room for lo-fi music
+                    currentUsers:
+                      type: integer
+                      example: 5
+                    maxUser:
+                      type: integer
+                      example: 10
+
+  /api/room/deleteroom:
+    delete:
+      summary: Delete a room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [roomid]
+              properties:
+                roomid:
+                  type: string
+                  example: abc123
+      responses:
+        '200':
+          description: Room deleted successfully
+        '404':
+          description: Room not found
+
+  /api/room/getid:
+    get:
+      summary: Get internal room ID
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          example: abc123
+      responses:
+        '200':
+          description: Room ID returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roomid:
+                    type: string
+                    example: abc123
+        '404':
+          description: Room not found
+
+  /api/room/info:
+    get:
+      summary: Get room information
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          example: abc123
+      responses:
+        '200':
+          description: Room information returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: Chill Room
+                  description:
+                    type: string
+                    example: Relax and listen to music
+                  currentUsers:
+                    type: integer
+                    example: 5
+        '404':
+          description: Room not found
+
+  /api/room/songlist:
+    get:
+      summary: Get current song queue for a room
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          example: abc123
+      responses:
+        '200':
+          description: Current queue returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                          example: Lo-fi Chillhop
+                        youtube_id:
+                          type: string
+                          example: dQw4w9WgXcQ
+                        added_by:
+                          type: string
+                          example: bob
+        '404':
+          description: Room not found
