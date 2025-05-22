@@ -1,6 +1,6 @@
 # REST API endpoints
 
-from flask import Flask, Blueprint, request, jsonify
+from flask import Flask, request, jsonify
 from classes import Room
 
 rooms = {}
