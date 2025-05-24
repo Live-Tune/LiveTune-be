@@ -1,7 +1,7 @@
 # REST API endpoints
 import os
 from flask import Flask, request, jsonify
-from classes import Room
+from app.classes import Room
 
 rooms = {}
 users = {}
