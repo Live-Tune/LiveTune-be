@@ -2,7 +2,9 @@
 
 from flask import Flask, request, jsonify
 from classes import Room
+from utils import *
 
+# Global variables
 rooms = {}
 users = {}
 
@@ -92,11 +94,8 @@ def get_room_info():
     except (ValueError, TypeError):
         return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    if ID in rooms:
-        room = rooms[ID]
-    else:
-        return jsonify({"error": "Room not found"}), 404
-
+    room = find_room(rooms, ID)
+    
     room_data = room.to_dict()
     if room_data:
         filtered = {
@@ -116,10 +115,7 @@ def get_song_list():
     except (ValueError, TypeError):
         return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    if ID in rooms:
-        room = rooms[ID]
-    else:
-        return jsonify({"error": "Room not found"}), 404  
+    room = find_room(rooms, ID)
 
     room_data = room.to_dict()
     if room_data:
