@@ -23,13 +23,13 @@ def createroom():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
 
-    room_name = data.get('room_name')
-    is_room_private = data.get('is_room_private', False)
-    room_description = data.get('room_description')
-    room_maxUser = data.get('room_maxUser')
-    room_host = data.get('room_host')
+    name = data.get('room_name')
+    is_private = data.get('is_room_private', False)
+    description = data.get('room_description')
+    max_user = data.get('room_maxUser')
+    host = data.get('room_host')
    
-    rooms[next_room_id] = Room(name=room_name, isPrivate=is_room_private, description=room_description, maxUser=room_maxUser, host=room_host, ID=next_room_id)
+    rooms[next_room_id] = Room(name=name, isPrivate=is_private, description=description, maxUser=max_user, host=host, ID=next_room_id)
     next_room_id += 1
 
     return "Room created successfully.", 201
@@ -43,13 +43,13 @@ def updatesettings():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
     
-    new_room_name = data.get('new_room_name')
-    new_room_description = data.get('new_room_description')
-    new_room_maxUser = data.get('new_room_maxUser')
-    new_room_host = data.get('new_room_host')
-    room_id = data.get('room_id')
+    name = data.get('name')
+    description = data.get('description')
+    max_user = data.get('max_user')
+    host = data.get('host')
+    id = data.get('id')
 
-    rooms[room_id].update_settings(new_room_name, new_room_description, new_room_maxUser, new_room_host)
+    rooms[id].update_settings(name, description, max_user, host)
 
     return "Room updated successfully.", 201
 
@@ -71,10 +71,10 @@ def getpublicrooms():
 def deleteroom():
 
     data = request.get_json()
-    delete_room_id = data.get('delete_room_id')
+    id = data.get('id')
 
-    if delete_room_id in rooms:
-        del rooms[delete_room_id]
+    if id in rooms:
+        del rooms[id]
         return "Room deleted successfully.", 200
     else:
         return "Room not found.", 404
@@ -82,9 +82,9 @@ def deleteroom():
 # Retrieving ID from room name
 @app.route('/api/room/getid', methods=['GET']) 
 def get_room_id():           
-    query_room_name = request.args.get('name')
+    name = request.args.get('name')
     for room_id, room_obj in rooms.items():
-        if room_obj.name == query_room_name:
+        if room_obj.name == name:
             return jsonify({"id": room_id})
     
     return jsonify({"error": "Room not found"}), 404
@@ -94,11 +94,11 @@ def get_room_id():
 def get_room_info():
     
     try:
-        room_id = int(request.args.get('id'))
+        id = int(request.args.get('id'))
     except ValueError:
         return jsonify({"error": "The ID must be a number"}), 400
 
-    room = rooms[room_id]
+    room = rooms[id]
     room_data = room.to_dict()
     if room_data:
         filtered = {
@@ -115,11 +115,11 @@ def get_room_info():
 def get_song_list():
 
     try:
-        room_id = int(request.args.get('id'))
+        id = int(request.args.get('id'))
     except ValueError:
         return jsonify({"error": "The ID must be a number"}), 400
 
-    room = rooms[room_id]
+    room = rooms[id]
     room_data = room.to_dict()
     if room_data:
         return jsonify(room_data.get("queue")), 200
