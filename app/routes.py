@@ -26,7 +26,8 @@ def createroom():
     rooms[next_room_id] = Room(data, ID=next_room_id)
     next_room_id += 1
 
-    return "Room created successfully.", 201
+    print("Room created successfully.") # testing purposes
+    return jsonify({"message": "Room created successfully"}), 201
 
 
 # Update room settings
@@ -43,7 +44,8 @@ def updatesettings():
 
     rooms[ID].update_settings(data)
 
-    return "Room updated successfully.", 201
+    print("Room updated successfully.") # testing purposes
+    return jsonify({"message": "Room updated successfully"}), 201
 
 # Retrieve available public rooms
 @app.route("/api/room/availablepublicrooms", methods=["GET"])
@@ -66,7 +68,8 @@ def deleteroom():
 
     if ID in rooms:
         del rooms[ID]
-        return "Room deleted successfully.", 200
+        print("Room deleted successfully.") # testing purposes
+        return jsonify({"message": "Room deleted successfully"}), 201
     else:
         return "Room not found.", 404
 
