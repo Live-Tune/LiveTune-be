@@ -23,13 +23,7 @@ def createroom():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
 
-    name = data.get('room_name')
-    is_private = data.get('is_room_private', False)
-    description = data.get('room_description')
-    max_user = data.get('room_maxUser')
-    host = data.get('room_host')
-   
-    rooms[next_room_id] = Room(name=name, isPrivate=is_private, description=description, maxUser=max_user, host=host, ID=next_room_id)
+    rooms[next_room_id] = Room(data, ID=next_room_id)
     next_room_id += 1
 
     return "Room created successfully.", 201
@@ -43,13 +37,9 @@ def updatesettings():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
     
-    name = data.get('name')
-    description = data.get('description')
-    max_user = data.get('max_user')
-    host = data.get('host')
-    id = data.get('id')
+    ID = data.get('ID')
 
-    rooms[id].update_settings(name, description, max_user, host)
+    rooms[ID].update_settings(data)
 
     return "Room updated successfully.", 201
 
@@ -59,7 +49,7 @@ def getpublicrooms():
 
     public_rooms_data = []
     for room_id, room_obj in rooms.items():
-        if not room_obj.isPrivate:
+        if not room_obj.is_private:
             # 일단 I will return the whole object but I think we should
             # only return a couple properties
             public_rooms_data.append(room_obj.to_dict())
@@ -70,11 +60,10 @@ def getpublicrooms():
 @app.route("/api/room/deleteroom", methods=["DELETE"])
 def deleteroom():
 
-    data = request.get_json()
-    id = data.get('id')
+    ID = int(request.args.get('ID'))
 
-    if id in rooms:
-        del rooms[id]
+    if ID in rooms:
+        del rooms[ID]
         return "Room deleted successfully.", 200
     else:
         return "Room not found.", 404
@@ -85,7 +74,7 @@ def get_room_id():
     name = request.args.get('name')
     for room_id, room_obj in rooms.items():
         if room_obj.name == name:
-            return jsonify({"id": room_id})
+            return jsonify({"ID": room_id})
     
     return jsonify({"error": "Room not found"}), 404
 
@@ -94,15 +83,15 @@ def get_room_id():
 def get_room_info():
     
     try:
-        id = int(request.args.get('id'))
+        ID = int(request.args.get('ID'))
     except ValueError:
         return jsonify({"error": "The ID must be a number"}), 400
 
-    room = rooms[id]
+    room = rooms[ID]
     room_data = room.to_dict()
     if room_data:
         filtered = {
-            "room_name": room_data["name"],
+            "name": room_data["name"],
             "description": room_data["description"],
             "current_users_number": len(room_data.get("currentUsers")),
             "host": room_data["host"],
@@ -115,11 +104,11 @@ def get_room_info():
 def get_song_list():
 
     try:
-        id = int(request.args.get('id'))
+        ID = int(request.args.get('ID'))
     except ValueError:
         return jsonify({"error": "The ID must be a number"}), 400
 
-    room = rooms[id]
+    room = rooms[ID]
     room_data = room.to_dict()
     if room_data:
         return jsonify(room_data.get("queue")), 200

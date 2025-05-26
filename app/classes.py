@@ -1,27 +1,29 @@
 class Room:
 
-    def __init__(self, name, isPrivate, description, maxUser, host, ID):
-        self.name = name
-        self.isPrivate = isPrivate
-        self.description = description
-        self.maxUser = maxUser
-        self.currentUsers = []
-        self.host = host
+    def __init__(self, data, ID):
+
+        self.name = data["name"]
+        self.is_private = data["is_private"]
+        self.description = data["description"]
+        self.max_user = data["max_user"]
+        self.host = data["host"]  
         self.ID = ID
+        self.currentUsers = []
         self.queue = []
     
-    def update_settings(self, new_room_name, new_room_description, new_room_maxUser, new_room_host):
-        self.name = new_room_name
-        self.description = new_room_description
-        self.maxUser = new_room_maxUser
-        self.host = new_room_host
+    def update_settings(self, data):
+
+        self.name = data["name"]
+        self.description = data["description"]
+        self.max_user = data["max_user"]
+        self.host = data["host"] 
     
     def to_dict(self):
         return {
             "name": self.name,
-            "isPrivate": self.isPrivate,
+            "isPrivate": self.is_private,
             "description": self.description,
-            "maxUser": self.maxUser,
+            "max_user": self.max_user,
             "currentUsers": self.currentUsers,
             "host": self.host,
             "queue": self.queue,
