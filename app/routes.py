@@ -1,6 +1,7 @@
 # REST API endpoints
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from app.classes import Room
 from app.utils import *
 
@@ -12,6 +13,7 @@ next_room_id = 1
 # ID is just a counter now
 
 app = Flask(__name__)
+CORS(app)
 
 ## -- ROOMS -- 
 
@@ -125,7 +127,7 @@ def get_song_list():
     room = find_room(rooms, ID)
 
     room_data = room.to_dict()
-    
+
     return jsonify(room_data.get("queue")), 200
 
 # TEST  
