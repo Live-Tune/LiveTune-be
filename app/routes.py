@@ -38,6 +38,8 @@ def updatesettings():
         return jsonify({"error": "Invalid JSON data"}), 400
     
     ID = data.get('ID')
+    if int(ID) not in rooms:
+        return jsonify({"error": "Room not found"}), 404
 
     rooms[ID].update_settings(data)
 
@@ -84,10 +86,14 @@ def get_room_info():
     
     try:
         ID = int(request.args.get('ID'))
-    except ValueError:
-        return jsonify({"error": "The ID must be a number"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    room = rooms[ID]
+    if ID in rooms:
+        room = rooms[ID]
+    else:
+        return jsonify({"error": "Room not found"}), 404
+
     room_data = room.to_dict()
     if room_data:
         filtered = {
@@ -97,18 +103,21 @@ def get_room_info():
             "host": room_data["host"],
         }
         return jsonify(filtered), 200
-    else:
-        return jsonify({"error": "Room not found"}), 404
     
+# Retrieve room's playlist
 @app.route('/api/room/songlist', methods=['GET'])
 def get_song_list():
 
     try:
         ID = int(request.args.get('ID'))
-    except ValueError:
-        return jsonify({"error": "The ID must be a number"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    room = rooms[ID]
+    if ID in rooms:
+        room = rooms[ID]
+    else:
+        return jsonify({"error": "Room not found"}), 404  
+
     room_data = room.to_dict()
     if room_data:
         return jsonify(room_data.get("queue")), 200
