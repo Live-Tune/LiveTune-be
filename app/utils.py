@@ -1,9 +1,9 @@
 from flask import jsonify
 
-def find_room(rooms: dict, ID: int):
+def find_room(rooms: dict, id: int):
     """
-    Finds a room by its ID in the rooms dictionary
+    Finds a room by its id in the rooms dictionary
     Returns the room object if found, None if not
     """
-    if ID in rooms:
-        return rooms.get(ID)
+    if id in rooms:
+        return rooms.get(id)

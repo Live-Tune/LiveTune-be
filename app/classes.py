@@ -1,13 +1,13 @@
 class Room:
 
-    def __init__(self, data, ID):
+    def __init__(self, data, id):
 
         self.name = data["name"]
         self.is_private = data["is_private"]
         self.description = data["description"]
         self.max_user = data["max_user"]
         self.host = data["host"]  
-        self.ID = ID
+        self.id = id
         self.current_users = []
         self.queue = []
     
@@ -27,7 +27,7 @@ class Room:
             "current_users": self.current_users,
             "host": self.host,
             "queue": self.queue,
-            "ID": self.ID
+            "id": self.id
         }
     
 class Song: 
