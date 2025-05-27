@@ -17,7 +17,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [room_name, is_room_private, room_description, room_maxUser, room_host, room_id]
+              required: [name, is_private, description, max_user, host, id]
               properties:
                 name:
                   type: string
@@ -49,7 +49,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [new_room_name, new_room_description, new_room_maxUser, new_room_host]
+              required: [name, description, max_user, host]
               properties:
                 name:
                   type: string
@@ -87,7 +87,7 @@ paths:
                   properties:
                     id:
                       type: string
-                      example: abc123
+                      example: 1
                     name:
                       type: string
                       example: Chill Room
@@ -110,7 +110,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [roomid]
+              required: [id]
               properties:
                 id:
                   type: integer
