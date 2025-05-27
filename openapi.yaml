@@ -19,21 +19,24 @@ paths:
               type: object
               required: [name, is_private, description, max_user, host, id]
               properties:
-                name:
+                room_name:
                   type: string
                   example: Chill Room
-                is_private: 
+                is_room_private: 
                   type: boolean
                   example: False
-                description:
+                room_description:
                   type: string
                   example: A room for relaxing music
-                max_user:
+                room_maxUser:
                   type: integer
                   example: 10
-                host:
+                room_host:
                   type: string
                   example: alice
+                room_id:
+                  type: integer
+                  example: 3
       responses:
         '200':
           description: Room created successfully
@@ -51,16 +54,16 @@ paths:
               type: object
               required: [name, description, max_user, host]
               properties:
-                name:
+                new_room_name:
                   type: string
                   example: Lo-Fi Room
-                description:
+                new_room_description:
                   type: string
                   example: A room for lo-fi music
-                max_user:
+                new_room_maxUser:
                   type: integer
                   example: 5
-                host:
+                new_room_host:
                   type: string
                   example: "kevin"
                 id:
@@ -94,10 +97,10 @@ paths:
                     description:
                       type: string
                       example: Public room for lo-fi music
-                    current_users:
+                    currentUsers:
                       type: integer
                       example: 5
-                    max_user:
+                    maxUser:
                       type: integer
                       example: 10
 
@@ -153,8 +156,8 @@ paths:
           name: id
           required: true
           schema:
-            type: integer
-          example: 1
+            type: string
+          example: abc123
       responses:
         '200':
           description: Room information returned
@@ -163,13 +166,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  name:
+                  title:
                     type: string
                     example: Chill Room
                   description:
                     type: string
                     example: Relax and listen to music
-                  current_users:
+                  currentUsers:
                     type: integer
                     example: 5
         '404':
@@ -183,7 +186,7 @@ paths:
           name: id
           required: true
           schema:
-            type: integer
+            type: string
           example: 1
       responses:
         '200':
@@ -198,7 +201,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        name:
+                        title:
                           type: string
                           example: Lo-fi Chillhop
                         youtube_id:
