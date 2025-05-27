@@ -29,7 +29,7 @@ def createroom():
     next_room_id += 1
 
     print("Room created successfully.") # testing purposes
-    return jsonify({"message": "Room created successfully"}), 201
+    return jsonify({"ID": (next_room_id - 1)}), 201
 
 
 # Update room settings
@@ -128,7 +128,7 @@ def get_song_list():
     
     return jsonify(room_data.get("queue")), 200
 
-# TEST  
+# # TEST  
 if __name__ == "__main__":
     host = os.environ.get("HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", 5000))
