@@ -1,24 +1,21 @@
+# ROUTES
+
 # REST API endpoints
-import os
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import request, jsonify, Blueprint
 from app.classes import Room
 from app.utils import *
 
-# Global variables
-rooms = {}
-users = {}
+from . import rooms, users
+next_room_id = 1 # ID is just a counter now
 
-next_room_id = 1
-# ID is just a counter now
-
-app = Flask(__name__)
-CORS(app)
+api_bp = Blueprint('api', __name__, url_prefix='/api') 
+# this is so that we can "attach" the routes to the app instance
+# defined in __init__. 
 
 ## -- ROOMS -- 
 
 # Create room
-@app.route("/api/room/createnew", methods=["POST"])
+@api_bp.route("/room/createnew", methods=["POST"])
 def createroom():
     
     global next_room_id
@@ -35,7 +32,7 @@ def createroom():
 
 
 # Update room settings
-@app.route("/api/room/updatesettings", methods=["PUT"])
+@api_bp.route("/room/updatesettings", methods=["PUT"])
 def updatesettings():
 
     data = request.get_json()
@@ -57,7 +54,7 @@ def updatesettings():
     return jsonify({"message": "Room updated successfully"}), 200
 
 # Retrieve available public rooms
-@app.route("/api/room/availablepublicrooms", methods=["GET"])
+@api_bp.route("/room/availablepublicrooms", methods=["GET"])
 def getpublicrooms():
 
     public_rooms_data = []
@@ -70,7 +67,7 @@ def getpublicrooms():
     return jsonify(public_rooms_data), 200
 
 # Deleting a room
-@app.route("/api/room/deleteroom", methods=["DELETE"])
+@api_bp.route("/room/deleteroom", methods=["DELETE"])
 def deleteroom():
 
     try:
@@ -85,7 +82,7 @@ def deleteroom():
         return jsonify({"message": "Room not found"}), 404
 
 # Retrieving ID from room name
-@app.route('/api/room/getid', methods=['GET']) 
+@api_bp.route("/room/getid", methods=['GET']) 
 def get_room_id():           
     name = request.args.get('name')
     for room_id, room_obj in rooms.items():
@@ -95,7 +92,7 @@ def get_room_id():
     return jsonify({"error": "Room not found"}), 404
 
 # Retrieve room info
-@app.route('/api/room/info', methods=['GET'])
+@api_bp.route("/room/info", methods=['GET'])
 def get_room_info():
     
     try:
@@ -116,7 +113,7 @@ def get_room_info():
         return jsonify(filtered), 200
     
 # Retrieve room's playlist
-@app.route('/api/room/songlist', methods=['GET'])
+@api_bp.route("/room/songlist", methods=['GET'])
 def get_song_list():
 
     try:
@@ -129,11 +126,3 @@ def get_song_list():
     room_data = room.to_dict()
 
     return jsonify(room_data.get("queue")), 200
-
-# TEST  
-if __name__ == "__main__":
-    host = os.environ.get("HOST", "0.0.0.0")
-    port = int(os.environ.get("PORT", 5000))
-    debug = os.environ.get("FLASK_ENV", "production") == "development"
-
-    app.run(host=host, port=port, debug=debug)
