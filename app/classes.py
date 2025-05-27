@@ -1,14 +1,14 @@
 class Room:
 
-    def __init__(self, data, id):
+    def __init__(self, data, ID):
 
         self.name = data["name"]
         self.is_private = data["is_private"]
         self.description = data["description"]
         self.max_user = data["max_user"]
         self.host = data["host"]  
-        self.id = id
-        self.current_users = []
+        self.ID = ID
+        self.currentUsers = []
         self.queue = []
     
     def update_settings(self, data):
@@ -24,10 +24,10 @@ class Room:
             "isPrivate": self.is_private,
             "description": self.description,
             "max_user": self.max_user,
-            "current_users": self.current_users,
+            "currentUsers": self.currentUsers,
             "host": self.host,
             "queue": self.queue,
-            "id": self.id
+            "ID": self.ID
         }
     
 class Song: 
