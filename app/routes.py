@@ -2,7 +2,7 @@
 import os
 from flask import Flask, request, jsonify
 from app.classes import Room
-from utils import *
+from app.utils import *
 
 # Global variables
 rooms = {}
