@@ -1,6 +1,7 @@
 # REST API endpoints
-
+import os
 from flask import Flask, request, jsonify
+from app.classes import Room
 from classes import Room
 from utils import *
 
@@ -130,4 +131,8 @@ def get_song_list():
 
 # TEST  
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_ENV", "production") == "development"
+
+    app.run(host=host, port=port, debug=debug)
