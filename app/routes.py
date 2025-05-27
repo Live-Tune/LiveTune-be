@@ -2,7 +2,10 @@
 import os
 from flask import Flask, request, jsonify
 from app.classes import Room
+from classes import Room
+from utils import *
 
+# Global variables
 rooms = {}
 users = {}
 
@@ -23,16 +26,11 @@ def createroom():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
 
-    room_name = data.get('room_name')
-    is_room_private = data.get('is_room_private', False)
-    room_description = data.get('room_description')
-    room_maxUser = data.get('room_maxUser')
-    room_host = data.get('room_host')
-   
-    rooms[next_room_id] = Room(name=room_name, isPrivate=is_room_private, description=room_description, maxUser=room_maxUser, host=room_host, ID=next_room_id)
+    rooms[next_room_id] = Room(data, ID=next_room_id)
     next_room_id += 1
 
-    return "Room created successfully.", 201
+    print("Room created successfully.") # testing purposes
+    return jsonify({"message": "Room created successfully"}), 201
 
 
 # Update room settings
@@ -43,15 +41,19 @@ def updatesettings():
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
     
-    new_room_name = data.get('new_room_name')
-    new_room_description = data.get('new_room_description')
-    new_room_maxUser = data.get('new_room_maxUser')
-    new_room_host = data.get('new_room_host')
-    room_id = data.get('room_id')
+    try:
+        ID = int(data.get('ID'))
+    except ValueError:
+        return jsonify({"error": "Room ID ('ID') must be an integer"}), 400
 
-    rooms[room_id].update_settings(new_room_name, new_room_description, new_room_maxUser, new_room_host)
+    room_to_update = find_room(rooms, ID) # Use find_room for consistency
+    if room_to_update is None:
+        return jsonify({"error": "Room not found"}), 404
 
-    return "Room updated successfully.", 201
+    rooms[ID].update_settings(data)
+
+    print("Room updated successfully.") # testing purposes
+    return jsonify({"message": "Room updated successfully"}), 200
 
 # Retrieve available public rooms
 @app.route("/api/room/availablepublicrooms", methods=["GET"])
@@ -59,7 +61,7 @@ def getpublicrooms():
 
     public_rooms_data = []
     for room_id, room_obj in rooms.items():
-        if not room_obj.isPrivate:
+        if not room_obj.is_private:
             # 일단 I will return the whole object but I think we should
             # only return a couple properties
             public_rooms_data.append(room_obj.to_dict())
@@ -70,22 +72,24 @@ def getpublicrooms():
 @app.route("/api/room/deleteroom", methods=["DELETE"])
 def deleteroom():
 
-    data = request.get_json()
-    delete_room_id = data.get('delete_room_id')
+    try:
+        ID = int(request.args.get('ID'))
+    except ValueError:
+        return jsonify({"message": "Query parameter 'ID' must be an integer"}), 400
 
-    if delete_room_id in rooms:
-        del rooms[delete_room_id]
-        return "Room deleted successfully.", 200
+    if find_room(rooms, ID) is not None:
+        del rooms[ID]
+        return jsonify({"message": "Room deleted successfully"}), 200
     else:
-        return "Room not found.", 404
+        return jsonify({"message": "Room not found"}), 404
 
 # Retrieving ID from room name
 @app.route('/api/room/getid', methods=['GET']) 
 def get_room_id():           
-    query_room_name = request.args.get('name')
+    name = request.args.get('name')
     for room_id, room_obj in rooms.items():
-        if room_obj.name == query_room_name:
-            return jsonify({"id": room_id})
+        if room_obj.name == name:
+            return jsonify({"ID": room_id})
     
     return jsonify({"error": "Room not found"}), 404
 
@@ -94,37 +98,36 @@ def get_room_id():
 def get_room_info():
     
     try:
-        room_id = int(request.args.get('id'))
-    except ValueError:
-        return jsonify({"error": "The ID must be a number"}), 400
+        ID = int(request.args.get('ID'))
+    except (ValueError, TypeError):
+        return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    room = rooms[room_id]
+    room = find_room(rooms, ID)
+    
     room_data = room.to_dict()
     if room_data:
         filtered = {
-            "room_name": room_data["name"],
-            "description": room_data["description"],
-            "current_users_number": len(room_data.get("currentUsers")),
-            "host": room_data["host"],
+            "name": room_data.get("name"),
+            "description": room_data.get("description"),
+            "current_users_number": len(room_data.get("currentUsers", [])),
+            "host": room_data.get("host"),
         }
         return jsonify(filtered), 200
-    else:
-        return jsonify({"error": "Room not found"}), 404
     
+# Retrieve room's playlist
 @app.route('/api/room/songlist', methods=['GET'])
 def get_song_list():
 
     try:
-        room_id = int(request.args.get('id'))
-    except ValueError:
-        return jsonify({"error": "The ID must be a number"}), 400
+        ID = int(request.args.get('ID'))
+    except (ValueError, TypeError):
+        return jsonify({"error": "Query parameter 'ID' must be an integer"}), 400
 
-    room = rooms[room_id]
+    room = find_room(rooms, ID)
+
     room_data = room.to_dict()
-    if room_data:
-        return jsonify(room_data.get("queue")), 200
-    else:
-        return jsonify({"error": "Room not found"}), 404
+    
+    return jsonify(room_data.get("queue")), 200
 
 # TEST  
 if __name__ == "__main__":
