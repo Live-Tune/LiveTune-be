@@ -19,24 +19,21 @@ paths:
               type: object
               required: [room_name, is_room_private, room_description, room_maxUser, room_host, room_id]
               properties:
-                room_name:
+                name:
                   type: string
                   example: Chill Room
-                is_room_private: 
+                is_private: 
                   type: boolean
                   example: False
-                room_description:
+                description:
                   type: string
                   example: A room for relaxing music
-                room_maxUser:
+                max_user:
                   type: integer
                   example: 10
-                room_host:
+                host:
                   type: string
                   example: alice
-                room_id:
-                  type: integer
-                  example: 3
       responses:
         '200':
           description: Room created successfully
@@ -54,18 +51,21 @@ paths:
               type: object
               required: [new_room_name, new_room_description, new_room_maxUser, new_room_host]
               properties:
-                new_room_name:
+                name:
                   type: string
                   example: Lo-Fi Room
-                new_room_description:
+                description:
                   type: string
                   example: A room for lo-fi music
-                new_room_maxUser:
+                max_user:
                   type: integer
                   example: 5
-                new_room_host:
+                host:
                   type: string
                   example: "kevin"
+                ID:
+                  type: integer
+                  example: 1
       responses:
         '200':
           description: Room updated successfully
@@ -85,7 +85,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    ID:
                       type: string
                       example: abc123
                     name:
@@ -94,10 +94,10 @@ paths:
                     description:
                       type: string
                       example: Public room for lo-fi music
-                    currentUsers:
+                    current_users:
                       type: integer
                       example: 5
-                    maxUser:
+                    max_user:
                       type: integer
                       example: 10
 
@@ -112,9 +112,9 @@ paths:
               type: object
               required: [roomid]
               properties:
-                roomid:
-                  type: string
-                  example: abc123
+                ID:
+                  type: integer
+                  example: 1
       responses:
         '200':
           description: Room deleted successfully
@@ -139,7 +139,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  room_id:
+                  ID:
                     type: integer
                     example: 3
         '404':
@@ -150,11 +150,11 @@ paths:
       summary: Get room information
       parameters:
         - in: query
-          name: id
+          name: ID
           required: true
           schema:
-            type: string
-          example: abc123
+            type: integer
+          example: 1
       responses:
         '200':
           description: Room information returned
@@ -163,13 +163,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  title:
+                  name:
                     type: string
                     example: Chill Room
                   description:
                     type: string
                     example: Relax and listen to music
-                  currentUsers:
+                  current_users:
                     type: integer
                     example: 5
         '404':
@@ -180,10 +180,10 @@ paths:
       summary: Get current song queue for a room
       parameters:
         - in: query
-          name: id
+          name: ID
           required: true
           schema:
-            type: string
+            type: integer
           example: 1
       responses:
         '200':
@@ -198,7 +198,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        title:
+                        name:
                           type: string
                           example: Lo-fi Chillhop
                         youtube_id:
