@@ -63,7 +63,7 @@ paths:
                 host:
                   type: string
                   example: "kevin"
-                ID:
+                id:
                   type: integer
                   example: 1
       responses:
@@ -85,7 +85,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    ID:
+                    id:
                       type: string
                       example: abc123
                     name:
@@ -112,7 +112,7 @@ paths:
               type: object
               required: [roomid]
               properties:
-                ID:
+                id:
                   type: integer
                   example: 1
       responses:
@@ -123,7 +123,7 @@ paths:
 
   /api/room/getid:
     get:
-      summary: Get internal room ID
+      summary: Get internal room id
       parameters:
         - in: query
           name: name
@@ -133,13 +133,13 @@ paths:
           example: Chill Room
       responses:
         '200':
-          description: Room ID returned
+          description: Room id returned
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  ID:
+                  id:
                     type: integer
                     example: 3
         '404':
@@ -150,7 +150,7 @@ paths:
       summary: Get room information
       parameters:
         - in: query
-          name: ID
+          name: id
           required: true
           schema:
             type: integer
@@ -180,7 +180,7 @@ paths:
       summary: Get current song queue for a room
       parameters:
         - in: query
-          name: ID
+          name: id
           required: true
           schema:
             type: integer
