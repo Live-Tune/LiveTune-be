@@ -8,7 +8,7 @@ class Room:
         self.max_user = data["max_user"]
         self.host = data["host"]  
         self.ID = ID
-        self.currentUsers = []
+        self.current_users = []
         self.queue = []
     
     def update_settings(self, data):
@@ -24,7 +24,7 @@ class Room:
             "isPrivate": self.is_private,
             "description": self.description,
             "max_user": self.max_user,
-            "currentUsers": self.currentUsers,
+            "current_users": self.current_users,
             "host": self.host,
             "queue": self.queue,
             "ID": self.ID
