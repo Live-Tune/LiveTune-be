@@ -1,0 +1,1 @@
+docker run -it --rm -v .:/app -w /app -p 5000:5000 livetune-be bash
