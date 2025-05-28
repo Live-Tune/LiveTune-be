@@ -15,7 +15,7 @@ def create_app(config_object=None):
     if config_object:
         app.config.from_object(config_object)
 
-    CORS(app, origins=["https://sootation.synology.me:8001/", "http://localhost:5173"])
+    CORS(app, origins=["https://sootation.synology.me:8001", "http://localhost:5173"])
 
     from . import routes
     app.register_blueprint(routes.api_bp)
