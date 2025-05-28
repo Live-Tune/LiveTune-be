@@ -47,7 +47,7 @@ def register_socket_events(socketio):
 
     @socketio.on("send_message")
     def on_message(data):
-        room_id = data.get("room_id")
+        room_id = int(data.get("room_id"))
         message_type = data.get("message_type")
         print(f"sent {message_type} from {room_id}")
 
@@ -56,10 +56,8 @@ def register_socket_events(socketio):
                 message = data.get("message")
                 socketio.emit("receive_message", {"message": message}, room=room_id)
             case "play":
-                broadcast_time = data.get("time")
                 socketio.emit("broadcast_play", {}, room=room_id, include_self=False)
             case "pause":
-                broadcast_time = data.get("time")
                 socketio.emit("broadcast_pause", {}, room=room_id, include_self=False)
             case "ping":
                 socketio.emit("pong", {}, to=request.sid)
