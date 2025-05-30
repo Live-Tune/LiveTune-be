@@ -7,3 +7,11 @@ def find_room(rooms: dict, id: int):
     """
     if id in rooms:
         return rooms.get(id)
+    
+def find_user(users: dict, id):
+    """
+    Finds a user by its id in the users dictionary
+    """
+
+    if id in users:
+        return users.get(id)
