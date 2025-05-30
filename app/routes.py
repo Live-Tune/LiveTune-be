@@ -182,36 +182,3 @@ def get_user_info():
     user_data = user.to_dict()
     if user_data:
         return jsonify({"username": user_data.get("username")}), 200
-
-# Delete user
-@api_bp.route("/user/delete", methods=['DELETE'])
-def delete_user():
-
-    user_id = request.args.get('id') # 'id' query param is expected to be the user UID
-    if user_id is None:
-        return jsonify({"error": "Query parameter 'id' (user UID) is required"}), 400
-
-    user_to_delete = find_user(users, user_id)
-    
-
-    if user_to_delete is not None: 
-        del users[user_id]
-
-        rooms_to_delete = [] # delete empty rooms
-
-        for room_id, room_obj in rooms.items():
-            if user_to_delete in room_obj.current_users:
-                room_obj.remove_user(user_id)
-                if room_obj.current_users == [] or user_to_delete == room_obj.host: 
-                    # delete the room if it's empty or the host left
-                    # we would probably want to improve this
-                    rooms_to_delete.append(room_id)
-
-        for r_id_del in rooms_to_delete:
-            if r_id_del in rooms: 
-                print(f"Room {r_id_del} is now empty and will be deleted because user {user_to_delete} was deleted.")
-                del rooms[r_id_del]
-
-        return jsonify({"message": f"User {user_to_delete} deleted successfully. Empty rooms were cleaned up."}), 200
-    else:
-        return jsonify({"message": "User not found"}), 404

@@ -346,25 +346,3 @@ paths:
           description: Query parameter 'id' (user UID) is required
         '404':
           description: User not found
-
-  /api/user/delete: # Path updated in previous step
-    delete:
-      tags:
-        - Users
-      summary: Delete a user
-      parameters:
-        - name: id
-          in: query
-          required: true
-          description: UID of the user to delete
-          schema:
-            type: string
-            format: uuid
-            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-      responses:
-        '200':
-          description: User deleted successfully
-        '400':
-          description: Query parameter 'id' (user UID) is required
-        '404':
-          description: User not found
