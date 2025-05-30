@@ -1,6 +1,7 @@
 from flask_socketio import join_room, leave_room
 from flask import request
 from . import rooms, users
+from app.utils import find_room
 
 def register_socket_events(socketio):
     @socketio.on("connect")
@@ -17,7 +18,7 @@ def register_socket_events(socketio):
         user = data.get("user")
         join_room(room_id)
 
-        if room_id in rooms.keys():
+        if find_room(rooms, room_id) != None:
             if user not in rooms[room_id].currentUsers:
                 rooms[room_id].currentUsers.append(user)
         else:
@@ -32,7 +33,7 @@ def register_socket_events(socketio):
         user = data.get("user")
         leave_room(room_id)
 
-        if room_id in rooms.keys():
+        if find_room(rooms, room_id) != None:
             if user in rooms[room_id].currentUsers:
                 rooms[room_id].currentUsers.remove(user)
             if len(rooms[room_id].currentUsers) == 0:
