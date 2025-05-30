@@ -1,8 +1,9 @@
 # REST API endpoints
 from flask import Flask, request, jsonify, Blueprint
 from flask_cors import CORS
-from app.classes import Room
+from app.classes import Room, User
 from app.utils import *
+import uuid
 
 from . import rooms, users
 next_room_id = 1 # id is just a counter now
@@ -75,6 +76,10 @@ def deleteroom():
         return jsonify({"message": "Query parameter 'id' must be an integer"}), 400
 
     if find_room(rooms, id) is not None:
+
+        if len(rooms[id].current_users) > 0:
+            rooms[id].current_users.clear()
+
         del rooms[id]
         return jsonify({"message": "Room deleted successfully"}), 200
     else:
@@ -125,3 +130,88 @@ def get_song_list():
     room_data = room.to_dict()
 
     return jsonify(room_data.get("queue")), 200
+
+
+# -- USERS -- 
+
+# Create user
+@api_bp.route("/user/create", methods=['POST'])
+def create_user(): 
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON data"}), 400
+
+    username = data.get("username")
+    user_id = str(uuid.uuid4())
+    users[user_id] = User(username, user_id)
+
+    print("User created successfully.") # testing purposes
+    return jsonify({"user_id": (user_id)}), 201
+
+
+# Update username
+@api_bp.route("/user/updateusername", methods=['PUT'])
+def update_username():
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON data"}), 400
+    
+    username = data.get("username")
+    user_id = data.get("id")
+    
+    if find_user(users, user_id) is not None:
+        users[user_id].update_username(username)
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+    print("Username updated successfully.") # testing purposes
+    return jsonify({"message": "Username updated successfully"}), 200
+
+# User info
+@api_bp.route("/user/info", methods=['GET'])
+def get_user_info():
+
+    user_id = request.args.get('id') # 'id' query param is expected to be the user UID
+    if user_id is None:
+        return jsonify({"error": "Query parameter 'id' (user UID) is required"}), 400
+
+    user = find_user(users, user_id)
+    
+    user_data = user.to_dict()
+    if user_data:
+        return jsonify({"username": user_data.get("username")}), 200
+
+# Delete user
+@api_bp.route("/user/delete", methods=['DELETE'])
+def delete_user():
+
+    user_id = request.args.get('id') # 'id' query param is expected to be the user UID
+    if user_id is None:
+        return jsonify({"error": "Query parameter 'id' (user UID) is required"}), 400
+
+    user_to_delete = find_user(users, user_id)
+    
+
+    if user_to_delete is not None: 
+        del users[user_id]
+
+        rooms_to_delete = [] # delete empty rooms
+
+        for room_id, room_obj in rooms.items():
+            if user_to_delete in room_obj.current_users:
+                room_obj.remove_user(user_id)
+                if room_obj.current_users == [] or user_to_delete == room_obj.host: 
+                    # delete the room if it's empty or the host left
+                    # we would probably want to improve this
+                    rooms_to_delete.append(room_id)
+
+        for r_id_del in rooms_to_delete:
+            if r_id_del in rooms: 
+                print(f"Room {r_id_del} is now empty and will be deleted because user {user_to_delete} was deleted.")
+                del rooms[r_id_del]
+
+        return jsonify({"message": f"User {user_to_delete} deleted successfully. Empty rooms were cleaned up."}), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
