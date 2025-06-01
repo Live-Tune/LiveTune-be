@@ -134,7 +134,7 @@ paths:
                     queue:
                       type: array
                       items:
-                        type: object # Song schema removed, items are generic objects
+                        type: object 
                         # example: [{ "title": "Some Song", "youtube_id": "some_id", "added_by": "user_uid" }]
 
   /api/room/deleteroom:
@@ -241,7 +241,7 @@ paths:
               schema: # The route returns the queue list directly as an array
                 type: array
                 items:
-                  type: object # Song schema removed, items are generic objects
+                  type: object 
                   # example: { "title": "Another Song", "youtube_id": "another_id", "added_by": "user_uid" }
         '400':
           description: Invalid ID format (e.g., not an integer)
@@ -272,14 +272,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  user_id:
+                  uid:
                     type: string
                     format: uuid
                     example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         '400':
           description: Invalid JSON data
 
-  /api/user/updateusername: # Path updated in previous step
+  /api/user/updateusername:
     put:
       tags:
         - Users
