@@ -71,15 +71,19 @@ def getpublicrooms():
 def deleteroom():
 
     try:
-        id = int(request.args.get('id'))
+        room_id = int(request.args.get('room_id'))
+        uid = request.args.get('uid')
     except ValueError:
         return jsonify({"message": "Query parameter 'id' must be an integer"}), 400
 
-    if find_room(rooms, id) is not None:
+    room_to_delete = find_room(rooms, room_id)
+    
+    if room_to_delete is not None:
 
-        if len(rooms[id].current_users) > 0:
-            rooms[id].current_users.clear()
-
+        if room_to_delete.host != uid:
+            return jsonify({"message": "User not host, cannot delete room"}), 400
+        
+        rooms[id].current_users.clear()
         del rooms[id]
         return jsonify({"message": "Room deleted successfully"}), 200
     else:
@@ -143,11 +147,11 @@ def create_user():
         return jsonify({"error": "Invalid JSON data"}), 400
 
     username = data.get("username")
-    user_id = str(uuid.uuid4())
-    users[user_id] = User(username, user_id)
+    uid = str(uuid.uuid4())
+    users[uid] = User(username, uid)
 
     print("User created successfully.") # testing purposes
-    return jsonify({"user_id": (user_id)}), 201
+    return jsonify({"uid": (uid)}), 201
 
 
 # Update username
@@ -159,10 +163,10 @@ def update_username():
         return jsonify({"error": "Invalid JSON data"}), 400
     
     username = data.get("username")
-    user_id = data.get("id")
+    uid = data.get("id")
     
-    if find_user(users, user_id) is not None:
-        users[user_id].update_username(username)
+    if find_user(users, uid) is not None:
+        users[uid].update_username(username)
     else:
         return jsonify({"error": "User not found"}), 404
 
@@ -173,11 +177,11 @@ def update_username():
 @api_bp.route("/user/info", methods=['GET'])
 def get_user_info():
 
-    user_id = request.args.get('id') # 'id' query param is expected to be the user UID
-    if user_id is None:
+    uid = request.args.get('id') # 'id' query param is expected to be the user UID
+    if uid is None:
         return jsonify({"error": "Query parameter 'id' (user UID) is required"}), 400
 
-    user = find_user(users, user_id)
+    user = find_user(users, uid)
     
     user_data = user.to_dict()
     if user_data:
