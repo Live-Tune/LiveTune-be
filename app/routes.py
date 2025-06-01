@@ -27,7 +27,7 @@ def createroom():
     next_room_id += 1
 
     print("Room created successfully.") # testing purposes
-    return jsonify({"ID": (next_room_id - 1)}), 201
+    return jsonify({"id": (next_room_id - 1)}), 201
 
 
 # Update room settings
