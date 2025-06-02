@@ -4,12 +4,20 @@ info:
   version: 1.0.0
   description: API for managing music streaming rooms.
 
+tags:
+  - name: Rooms
+    description: Operations related to rooms
+  - name: Users
+    description: Operations related to users
+
 servers:
   - url: https://api.livetune.app
 
 paths:
   /api/room/createnew:
     post:
+      tags:
+        - Rooms
       summary: Create a new room
       requestBody:
         required: true
@@ -17,34 +25,41 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, is_private, description, max_user, host, id]
+              required: [name, is_private, description, max_user, host]
               properties:
-                room_name:
+                name:
                   type: string
                   example: Chill Room
-                is_room_private: 
+                is_private:
                   type: boolean
                   example: False
-                room_description:
+                description:
                   type: string
                   example: A room for relaxing music
-                room_maxUser:
+                max_user:
                   type: integer
                   example: 10
-                room_host:
+                host:
                   type: string
                   example: alice
-                room_id:
-                  type: integer
-                  example: 3
       responses:
-        '200':
+        '201':
           description: Room created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                    example: 1
         '400':
           description: Invalid input
 
   /api/room/updatesettings:
     put:
+      tags:
+        - Rooms
       summary: Update room settings
       requestBody:
         required: true
@@ -52,31 +67,36 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, description, max_user, host]
+              required: [id, name, description, max_user, host]
               properties:
-                new_room_name:
-                  type: string
-                  example: Lo-Fi Room
-                new_room_description:
-                  type: string
-                  example: A room for lo-fi music
-                new_room_maxUser:
-                  type: integer
-                  example: 5
-                new_room_host:
-                  type: string
-                  example: "kevin"
                 id:
                   type: integer
+                  description: The ID of the room to update.
                   example: 1
+                name:
+                  type: string
+                  example: Lo-Fi Room
+                description:
+                  type: string
+                  example: A room for lo-fi music
+                max_user:
+                  type: integer
+                  example: 5
+                host:
+                  type: string
+                  example: "kevin"
       responses:
         '200':
           description: Room updated successfully
         '400':
           description: Invalid input
+        '404':
+          description: Room not found
 
   /api/room/availablepublicrooms:
     get:
+      tags:
+        - Rooms
       summary: Get a list of all public rooms
       responses:
         '200':
@@ -89,43 +109,59 @@ paths:
                   type: object
                   properties:
                     id:
-                      type: string
+                      type: integer
                       example: 1
                     name:
                       type: string
                       example: Chill Room
+                    isPrivate: # As per Room.to_dict()
+                      type: boolean
+                      example: false
                     description:
                       type: string
                       example: Public room for lo-fi music
-                    currentUsers:
-                      type: integer
-                      example: 5
-                    maxUser:
+                    current_users: 
+                      type: array
+                      items:
+                        type: string
+                      example: ["user1_uid", "user2_uid"]
+                    max_user: # As per Room.to_dict()
                       type: integer
                       example: 10
+                    host:
+                      type: string
+                      example: "alice_uid"
+                    queue:
+                      type: array
+                      items:
+                        type: object 
+                        # example: [{ "title": "Some Song", "youtube_id": "some_id", "added_by": "user_uid" }]
 
   /api/room/deleteroom:
     delete:
+      tags:
+        - Rooms
       summary: Delete a room
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [id]
-              properties:
-                id:
-                  type: integer
-                  example: 1
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID of the room to delete
+          schema:
+            type: integer
+            example: 1
       responses:
         '200':
           description: Room deleted successfully
         '404':
           description: Room not found
 
+        '400':
+          description: Invalid ID format (e.g., not an integer)
   /api/room/getid:
     get:
+      tags:
+        - Rooms
       summary: Get internal room id
       parameters:
         - in: query
@@ -150,14 +186,16 @@ paths:
 
   /api/room/info:
     get:
+      tags:
+        - Rooms
       summary: Get room information
       parameters:
         - in: query
           name: id
           required: true
           schema:
-            type: string
-          example: abc123
+            type: integer
+          example: 1
       responses:
         '200':
           description: Room information returned
@@ -166,49 +204,145 @@ paths:
               schema:
                 type: object
                 properties:
-                  title:
+                  name:
                     type: string
                     example: Chill Room
                   description:
                     type: string
                     example: Relax and listen to music
-                  currentUsers:
+                  current_users_number:
                     type: integer
                     example: 5
+                  host:
+                    type: string
+                    example: "user_uid_123"
+        '400':
+          description: Invalid ID format (e.g., not an integer)
         '404':
           description: Room not found
 
   /api/room/songlist:
     get:
+      tags:
+        - Rooms
       summary: Get current song queue for a room
       parameters:
         - in: query
           name: id
           required: true
           schema:
-            type: string
-          example: 1
+            type: integer 
+          example: 1 
       responses:
         '200':
           description: Current queue returned
           content:
             application/json:
+              schema: # The route returns the queue list directly as an array
+                type: array
+                items:
+                  type: object 
+                  # example: { "title": "Another Song", "youtube_id": "another_id", "added_by": "user_uid" }
+        '400':
+          description: Invalid ID format (e.g., not an integer)
+        '404':
+          description: Room not found
+
+  /api/user/create: 
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username]
+              properties:
+                username:
+                  type: string
+                  example: CoolUser123
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
               schema:
                 type: object
                 properties:
-                  queue:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        title:
-                          type: string
-                          example: Lo-fi Chillhop
-                        youtube_id:
-                          type: string
-                          example: dQw4w9WgXcQ
-                        added_by:
-                          type: string
-                          example: bob
+                  uid:
+                    type: string
+                    format: uuid
+                    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        '400':
+          description: Invalid JSON data
+
+  /api/user/updateusername:
+    put:
+      tags:
+        - Users
+      summary: Update a user's username
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, username]
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: The UID of the user to update.
+                  example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                username:
+                  type: string
+                  example: NewCoolName
+      responses:
+        '200':
+          description: Username updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Username updated successfully
+        '400':
+          description: Invalid JSON data
         '404':
-          description: Room not found
+          description: User not found
+
+
+  /api/user/info:
+    get:
+      tags:
+        - Users
+      summary: Get user information
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: UID of the user
+          schema:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      responses:
+        '200':
+          description: User information returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "CoolUser123"
+        '400':
+          description: Query parameter 'id' (user UID) is required
+        '404':
+          description: User not found

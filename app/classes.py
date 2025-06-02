@@ -8,7 +8,7 @@ class Room:
         self.max_user = data["max_user"]
         self.host = data["host"]  
         self.id = id
-        self.currentUsers = []
+        self.current_users = []
         self.queue = []
     
     def update_settings(self, data):
@@ -24,15 +24,36 @@ class Room:
             "isPrivate": self.is_private,
             "description": self.description,
             "max_user": self.max_user,
-            "currentUsers": self.currentUsers,
+            "current_users": self.current_users,
             "host": self.host,
             "queue": self.queue,
             "id": self.id
         }
     
+    def add_user(self, user_id):
+        self.current_users.append(user_id)
+
+    def remove_user(self, user_id):
+        self.current_users.remove(user_id)
+
 class Song: 
 
     def __init__(self, title, youtube_id, added_by):
         self.title = title
         self.youtube_id = youtube_id
         self.added_by = added_by
+
+class User:
+
+    def __init__(self, username, uid):
+        self.username = username
+        self.uid = uid
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "uid": self.uid
+        }
+
+    def update_username(self, username):
+        self.username = username
