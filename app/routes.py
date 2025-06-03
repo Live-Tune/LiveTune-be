@@ -116,6 +116,7 @@ def get_room_info():
             "name": room_data.get("name"),
             "description": room_data.get("description"),
             "current_users_number": len(room_data.get("current_users_number", [])),
+            "max_user": room_data.get("max_user"),
             "host": room_data.get("host"),
         }
         return jsonify(filtered), 200
