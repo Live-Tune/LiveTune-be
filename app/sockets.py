@@ -25,7 +25,7 @@ def register_socket_events(socketio):
             print(f"Room {room_id} not found")
 
         print(f"{users[uid].username} joined room {room_id}")
-        socketio.emit("user_joined", {"user": uid}, room=room_id)
+        socketio.emit("user_joined", {"uid": uid}, room=room_id)
 
     @socketio.on("leave_room")
     def on_leave(data):
@@ -43,7 +43,7 @@ def register_socket_events(socketio):
             print(f"Room {room_id} not found")
             
         print(f"{users[uid].username} left room {room_id}")
-        socketio.emit("user_left", {"user": user}, room=room_id)
+        socketio.emit("user_left", {"uid": uid}, room=room_id)
 
 
     @socketio.on("send_message")
