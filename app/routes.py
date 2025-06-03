@@ -23,6 +23,8 @@ def createroom():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
+    elif data.get("host") not in users:
+        return jsonify({"error": "User not found"}), 404
 
     rooms[next_room_id] = Room(data, id=next_room_id)
     next_room_id += 1
