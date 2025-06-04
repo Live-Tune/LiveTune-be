@@ -9,6 +9,8 @@ tags:
     description: Operations related to rooms
   - name: Users
     description: Operations related to users
+  - name: Videos
+    description: Operations related to YouTube videos
 
 servers:
   - url: https://api.livetune.app
@@ -346,3 +348,33 @@ paths:
           description: Query parameter 'id' (user UID) is required
         '404':
           description: User not found
+  /api/video/title:
+    get:
+      tags: 
+        - Videos
+      summary: Get YouTube video title
+      parameters:
+        - name: youtubeid
+          in: query
+          required: true
+          description: YouTube video ID
+          schema:
+            type: string
+            example: ZEcqHA7dbwM
+      responses:
+        '200':
+          description: YouTube video title returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: Fly Me To The Moon (2008 Remastered)
+        '400':
+          description: Missing or invalid YouTube video ID
+        '404':
+          description: Video not found
+        '500':
+          description: Failed to fetch video data or missing API key
