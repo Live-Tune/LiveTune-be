@@ -15,35 +15,35 @@ def register_socket_events(socketio):
     @socketio.on("join_room")
     def on_join(data):
         room_id = int(data.get("room_id"))
-        user = data.get("user")
+        uid = data.get("uid")
         join_room(room_id)
 
         if find_room(rooms, room_id) != None:
-            if user not in rooms[room_id].currentUsers:
-                rooms[room_id].currentUsers.append(user)
+            if uid not in rooms[room_id].current_users:
+                rooms[room_id].current_users.append(uid)
         else:
             print(f"Room {room_id} not found")
 
-        print(f"{user} joined room {room_id}")
-        socketio.emit("user_joined", {"user": user}, room=room_id)
+        print(f"{users[uid].username} joined room {room_id}")
+        socketio.emit("user_joined", {"uid": uid}, room=room_id)
 
     @socketio.on("leave_room")
     def on_leave(data):
         room_id = int(data.get("room_id"))
-        user = data.get("user")
+        uid = data.get("uid")
         leave_room(room_id)
 
         if find_room(rooms, room_id) != None:
-            if user in rooms[room_id].currentUsers:
-                rooms[room_id].currentUsers.remove(user)
-            if len(rooms[room_id].currentUsers) == 0:
+            if uid in rooms[room_id].current_users:
+                rooms[room_id].current_users.remove(uid)
+            if len(rooms[room_id].current_users) == 0:
                 del rooms[room_id]
                 print(f"Room {room_id} deleted due to no user")
         else:
             print(f"Room {room_id} not found")
             
-        print(f"{user} left room {room_id}")
-        socketio.emit("user_left", {"user": user}, room=room_id)
+        print(f"{users[uid].username} left room {room_id}")
+        socketio.emit("user_left", {"uid": uid}, room=room_id)
 
 
     @socketio.on("send_message")
@@ -60,6 +60,16 @@ def register_socket_events(socketio):
                 socketio.emit("broadcast_play", {}, room=room_id, include_self=False)
             case "pause":
                 socketio.emit("broadcast_pause", {}, room=room_id, include_self=False)
+            case "sync":
+                timestamp = data.get("timestamp");
+                socketio.emit("broadcast_sync", {"timestamp": timestamp}, room=room_id, include_self=False)
+            case "add":
+                youtubeId = data.get("youtubeId")
+                rooms[room_id].queue.append(youtubeId)
+                socketio.emit("broadcast_add", {"youtubeId": youtubeId}, room=room_id, include_self=False)
+            case "skip":
+                rooms[room_id].queue.pop(0)
+                socketio.emit("broadcast_skip", {}, room=room_id, include_self=False)
             case "ping":
                 socketio.emit("pong", {}, to=request.sid)
             case _:

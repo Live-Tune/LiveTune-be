@@ -117,7 +117,7 @@ def get_room_info():
         filtered = {
             "name": room_data.get("name"),
             "description": room_data.get("description"),
-            "current_users_number": len(room_data.get("current_users_number", [])),
+            "current_users": room_data.get("current_users"),
             "max_user": room_data.get("max_user"),
             "host": room_data.get("host"),
         }
