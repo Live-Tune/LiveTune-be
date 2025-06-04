@@ -60,6 +60,16 @@ def register_socket_events(socketio):
                 socketio.emit("broadcast_play", {}, room=room_id, include_self=False)
             case "pause":
                 socketio.emit("broadcast_pause", {}, room=room_id, include_self=False)
+            case "sync":
+                timestamp = data.get("timestamp");
+                socketio.emit("broadcast_sync", {"timestamp": timestamp}, room=room_id, include_self=False)
+            case "add":
+                youtubeId = data.get("youtubeId")
+                rooms[room_id].queue.append(youtubeId)
+                socketio.emit("broadcast_add", {"youtubeId": youtubeId}, room=room_id, include_self=False)
+            case "skip":
+                rooms[room_id].queue.pop(0)
+                socketio.emit("broadcast_skip", {}, room=room_id, include_self=False)
             case "ping":
                 socketio.emit("pong", {}, to=request.sid)
             case _:
