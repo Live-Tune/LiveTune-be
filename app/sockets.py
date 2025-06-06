@@ -3,6 +3,9 @@ from flask import request
 from . import rooms, users
 from app.utils import find_room
 
+sid_map = {}
+uid_map = {}
+
 def register_socket_events(socketio):
     @socketio.on("connect")
     def on_connect():
@@ -16,6 +19,8 @@ def register_socket_events(socketio):
     def on_join(data):
         room_id = int(data.get("room_id"))
         uid = data.get("uid")
+        sid_map[uid] = request.sid
+        uid_map[request.sid] = uid
         join_room(room_id)
 
         if find_room(rooms, room_id) != None:
@@ -31,6 +36,8 @@ def register_socket_events(socketio):
     def on_leave(data):
         room_id = int(data.get("room_id"))
         uid = data.get("uid")
+        del sid_map[uid]
+        del uid_map[request.sid]
         leave_room(room_id)
 
         if find_room(rooms, room_id) != None:
@@ -63,11 +70,18 @@ def register_socket_events(socketio):
             case "sync":
                 timestamp = data.get("timestamp");
                 socketio.emit("broadcast_sync", {"timestamp": timestamp}, room=room_id, include_self=False)
+            case "req_sync":
+                host_uid = rooms[room_id].host
+                host_sid = sid_map[host_uid]
+                socketio.emit("req_sync", {}, to=host_sid)
             case "add":
-                youtubeId = data.get("youtubeId")
-                rooms[room_id].queue.append(youtubeId)
-                socketio.emit("broadcast_add", {"youtubeId": youtubeId}, room=room_id, include_self=False)
+                video = data.get("video")
+                rooms[room_id].queue.append(video)
+                socketio.emit("broadcast_add", {"video": video}, room=room_id, include_self=False)
             case "skip":
+                print(rooms[room_id].queue[0])
+                rooms[room_id].current_song = rooms[room_id].queue[0]
+                print(rooms[room_id].current_song)
                 rooms[room_id].queue.pop(0)
                 socketio.emit("broadcast_skip", {}, room=room_id, include_self=False)
             case "ping":
