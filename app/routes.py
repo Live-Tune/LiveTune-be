@@ -4,9 +4,15 @@ from flask_cors import CORS
 from app.classes import Room, User
 from app.utils import *
 import uuid
+import requests 
+import os
 
 from . import rooms, users
 next_room_id = 1 # id is just a counter now
+
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")  
+# retrieving api key for youtube data api
+# environment variable for sapi key needs to be set
 
 api_bp = Blueprint('api', __name__, url_prefix='/api') 
 # this is so that we can "attach" the routes to the app instance
@@ -189,3 +195,32 @@ def get_user_info():
     user_data = user.to_dict()
     if user_data:
         return jsonify({"username": user_data.get("username")}), 200
+    
+
+
+# Retrieve video title
+@api_bp.route("/video/title", methods=["GET"])
+def get_youtube_title():
+    video_id = request.args.get("youtubeid")
+    if not video_id:
+        return jsonify({"error": "Missing YouTube video ID"}), 400
+
+    if not YOUTUBE_API_KEY:
+        return jsonify({"error": "YouTube API key not configured"}), 500
+
+    url = (
+        f"https://www.googleapis.com/youtube/v3/videos"     # youtube data api v3 is used to retrieve video data
+        f"?part=snippet&id={video_id}&key={YOUTUBE_API_KEY}"
+    )
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch video data"}), 500
+
+    data = response.json()
+    items = data.get("items", [])
+    if not items:
+        return jsonify({"error": "Video not found"}), 404
+
+    title = items[0]["snippet"]["title"]
+    return jsonify({"title": title}), 200
