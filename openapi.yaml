@@ -45,7 +45,7 @@ paths:
                   type: string
                   example: alice
       responses:
-        '201':
+        "201":
           description: Room created successfully
           content:
             application/json:
@@ -55,7 +55,7 @@ paths:
                   ID:
                     type: integer
                     example: 1
-        '400':
+        "400":
           description: Invalid input
 
   /api/room/updatesettings:
@@ -88,11 +88,11 @@ paths:
                   type: string
                   example: "kevin"
       responses:
-        '200':
+        "200":
           description: Room updated successfully
-        '400':
+        "400":
           description: Invalid input
-        '404':
+        "404":
           description: Room not found
 
   /api/room/availablepublicrooms:
@@ -101,7 +101,7 @@ paths:
         - Rooms
       summary: Get a list of all public rooms
       responses:
-        '200':
+        "200":
           description: List of public rooms
           content:
             application/json:
@@ -122,7 +122,7 @@ paths:
                     description:
                       type: string
                       example: Public room for lo-fi music
-                    current_users: 
+                    current_users:
                       type: array
                       items:
                         type: string
@@ -136,7 +136,7 @@ paths:
                     queue:
                       type: array
                       items:
-                        type: object 
+                        type: object
                         # example: [{ "title": "Some Song", "youtube_id": "some_id", "added_by": "user_uid" }]
 
   /api/room/deleteroom:
@@ -153,12 +153,12 @@ paths:
             type: integer
             example: 1
       responses:
-        '200':
+        "200":
           description: Room deleted successfully
-        '404':
+        "404":
           description: Room not found
 
-        '400':
+        "400":
           description: Invalid ID format (e.g., not an integer)
   /api/room/getid:
     get:
@@ -173,7 +173,7 @@ paths:
           required: true
           example: Chill Room
       responses:
-        '200':
+        "200":
           description: Room id returned
           content:
             application/json:
@@ -183,7 +183,7 @@ paths:
                   id:
                     type: integer
                     example: 3
-        '404':
+        "404":
           description: Room not found
 
   /api/room/info:
@@ -199,7 +199,7 @@ paths:
             type: integer
           example: 1
       responses:
-        '200':
+        "200":
           description: Room information returned
           content:
             application/json:
@@ -212,15 +212,17 @@ paths:
                   description:
                     type: string
                     example: Relax and listen to music
-                  current_users_number:
-                    type: integer
-                    example: 5
+                  current_user:
+                    type: array
+                    items:
+                      type: string
+                    example: ["user1_uid", "user2_uid"]
                   host:
                     type: string
                     example: "user_uid_123"
-        '400':
+        "400":
           description: Invalid ID format (e.g., not an integer)
-        '404':
+        "404":
           description: Room not found
 
   /api/room/songlist:
@@ -233,24 +235,24 @@ paths:
           name: id
           required: true
           schema:
-            type: integer 
-          example: 1 
+            type: integer
+          example: 1
       responses:
-        '200':
+        "200":
           description: Current queue returned
           content:
             application/json:
               schema: # The route returns the queue list directly as an array
                 type: array
                 items:
-                  type: object 
+                  type: object
                   # example: { "title": "Another Song", "youtube_id": "another_id", "added_by": "user_uid" }
-        '400':
+        "400":
           description: Invalid ID format (e.g., not an integer)
-        '404':
+        "404":
           description: Room not found
 
-  /api/user/create: 
+  /api/user/create:
     post:
       tags:
         - Users
@@ -267,7 +269,7 @@ paths:
                   type: string
                   example: CoolUser123
       responses:
-        '201':
+        "201":
           description: User created successfully
           content:
             application/json:
@@ -278,7 +280,7 @@ paths:
                     type: string
                     format: uuid
                     example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-        '400':
+        "400":
           description: Invalid JSON data
 
   /api/user/updateusername:
@@ -303,7 +305,7 @@ paths:
                   type: string
                   example: NewCoolName
       responses:
-        '200':
+        "200":
           description: Username updated successfully
           content:
             application/json:
@@ -313,11 +315,10 @@ paths:
                   message:
                     type: string
                     example: Username updated successfully
-        '400':
+        "400":
           description: Invalid JSON data
-        '404':
+        "404":
           description: User not found
-
 
   /api/user/info:
     get:
@@ -334,7 +335,7 @@ paths:
             format: uuid
             example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
-        '200':
+        "200":
           description: User information returned
           content:
             application/json:
@@ -344,10 +345,11 @@ paths:
                   username:
                     type: string
                     example: "CoolUser123"
-        '400':
+        "400":
           description: Query parameter 'id' (user UID) is required
         '404':
           description: User not found
+
   /api/video/title:
     get:
       tags: 
