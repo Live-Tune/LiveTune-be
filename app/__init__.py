@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 
 rooms = {}
 users = {}
+sid_user_map = {} #mapping between SIDs and users
 allowed_origins=["https://sootation.synology.me:8001", "http://localhost:5173"]
 
 socketio = SocketIO(cors_allowed_origins=allowed_origins)
