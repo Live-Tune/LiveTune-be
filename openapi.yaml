@@ -43,7 +43,9 @@ paths:
                   example: 10
                 host:
                   type: string
-                  example: alice
+                  format: uuid
+                  description: UID of the host user.
+                  example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
         "201":
           description: Room created successfully
@@ -52,11 +54,27 @@ paths:
               schema:
                 type: object
                 properties:
-                  ID:
+                  id:
                     type: integer
                     example: 1
         "400":
-          description: Invalid input
+          description: Invalid JSON data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: User (host) not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   /api/room/updatesettings:
     put:
@@ -86,14 +104,37 @@ paths:
                   example: 5
                 host:
                   type: string
-                  example: "kevin"
+                  format: uuid
+                  description: UID of the host user.
+                  example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
         "200":
           description: Room updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         "400":
-          description: Invalid input
+          description: Invalid JSON data or Room ID not an integer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         "404":
           description: Room not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   /api/room/availablepublicrooms:
     get:
@@ -113,10 +154,10 @@ paths:
                     id:
                       type: integer
                       example: 1
-                    name:
+                    name: # Assuming Room.to_dict() returns these keys
                       type: string
                       example: Chill Room
-                    isPrivate: # As per Room.to_dict()
+                    is_private: # Assuming Room.to_dict() returns snake_case
                       type: boolean
                       example: false
                     description:
@@ -127,17 +168,25 @@ paths:
                       items:
                         type: string
                       example: ["user1_uid", "user2_uid"]
-                    max_user: # As per Room.to_dict()
+                    max_user: # Assuming Room.to_dict() returns snake_case
                       type: integer
                       example: 10
                     host:
                       type: string
+                      format: uuid
                       example: "alice_uid"
                     queue:
                       type: array
                       items:
                         type: object
-                        # example: [{ "title": "Some Song", "youtube_id": "some_id", "added_by": "user_uid" }]
+                        properties:
+                          title:
+                            type: string
+                          youtube_id:
+                            type: string
+                          added_by: # UID of user who added the song
+                            type: string
+                            format: uuid
 
   /api/room/deleteroom:
     delete:
@@ -145,21 +194,50 @@ paths:
         - Rooms
       summary: Delete a room
       parameters:
-        - name: id
+        - name: room_id
           in: query
           required: true
           description: ID of the room to delete
           schema:
             type: integer
             example: 1
+        - name: uid
+          in: query
+          required: true
+          description: UID of the user attempting to delete (must be host)
+          schema:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
         "200":
           description: Room deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: Invalid room_id format or user is not the host
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string # Python returns message for this 400
         "404":
           description: Room not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string # Python returns message for this 404
 
-        "400":
-          description: Invalid ID format (e.g., not an integer)
   /api/room/getid:
     get:
       tags:
@@ -185,6 +263,13 @@ paths:
                     example: 3
         "404":
           description: Room not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   /api/room/info:
     get:
@@ -212,18 +297,59 @@ paths:
                   description:
                     type: string
                     example: Relax and listen to music
-                  current_user:
+                  current_users:
                     type: array
                     items:
                       type: string
+                      format: uuid
                     example: ["user1_uid", "user2_uid"]
+                  max_user:
+                    type: integer
+                    example: 10
                   host:
                     type: string
+                    format: uuid
                     example: "user_uid_123"
+                  queue:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        youtube_id:
+                          type: string
+                        added_by:
+                          type: string
+                          format: uuid
+                  current_song: # Assuming similar structure to a queue item
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      youtube_id:
+                        type: string
+                      added_by:
+                        type: string
+                        format: uuid
         "400":
-          description: Invalid ID format (e.g., not an integer)
+          description: Invalid ID format (must be an integer)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         "404":
           description: Room not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string # Assuming Python code handles None room and returns 404
 
   /api/room/songlist:
     get:
@@ -246,11 +372,35 @@ paths:
                 type: array
                 items:
                   type: object
-                  # example: { "title": "Another Song", "youtube_id": "another_id", "added_by": "user_uid" }
+                  properties:
+                    title:
+                      type: string
+                      example: "Another Song"
+                    youtube_id:
+                      type: string
+                      example: "another_id"
+                    added_by: # UID of user who added the song
+                      type: string
+                      format: uuid
+                      example: "user_uid_xyz"
         "400":
-          description: Invalid ID format (e.g., not an integer)
+          description: Invalid ID format (must be an integer)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         "404":
           description: Room not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string # Assuming Python code handles None room and returns 404
 
   /api/user/create:
     post:
@@ -282,6 +432,13 @@ paths:
                     example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         "400":
           description: Invalid JSON data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   /api/user/updateusername:
     put:
@@ -317,8 +474,22 @@ paths:
                     example: Username updated successfully
         "400":
           description: Invalid JSON data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         "404":
           description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   /api/user/info:
     get:
@@ -346,9 +517,23 @@ paths:
                     type: string
                     example: "CoolUser123"
         "400":
-          description: Query parameter 'id' (user UID) is required
+          description: Query parameter 'id' (user UID) is required or missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         '404':
           description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string # Assuming Python code handles None user and returns 404
 
   /api/video/title:
     get:
@@ -375,8 +560,29 @@ paths:
                     type: string
                     example: Fly Me To The Moon (2008 Remastered)
         '400':
-          description: Missing or invalid YouTube video ID
+          description: Missing YouTube video ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         '404':
           description: Video not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         '500':
-          description: Failed to fetch video data or missing API key
+          description: Failed to fetch video data or YouTube API key not configured
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string

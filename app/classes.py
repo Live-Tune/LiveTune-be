@@ -10,6 +10,7 @@ class Room:
         self.id = id
         self.current_users = []
         self.queue = []
+        self.current_song = None
     
     def update_settings(self, data):
 
@@ -27,7 +28,8 @@ class Room:
             "current_users": self.current_users,
             "host": self.host,
             "queue": self.queue,
-            "id": self.id
+            "id": self.id,
+            "current_song": self.current_song
         }
     
     def add_user(self, user_id):
