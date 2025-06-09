@@ -525,7 +525,7 @@ paths:
                 properties:
                   error:
                     type: string
-        '404':
+        "404":
           description: User not found
           content:
             application/json:
@@ -537,7 +537,7 @@ paths:
 
   /api/video/title:
     get:
-      tags: 
+      tags:
         - Videos
       summary: Get YouTube video title
       parameters:
@@ -549,7 +549,7 @@ paths:
             type: string
             example: ZEcqHA7dbwM
       responses:
-        '200':
+        "200":
           description: YouTube video title returned
           content:
             application/json:
@@ -559,7 +559,7 @@ paths:
                   title:
                     type: string
                     example: Fly Me To The Moon (2008 Remastered)
-        '400':
+        "400":
           description: Missing YouTube video ID
           content:
             application/json:
@@ -568,7 +568,7 @@ paths:
                 properties:
                   error:
                     type: string
-        '404':
+        "404":
           description: Video not found
           content:
             application/json:
@@ -577,7 +577,7 @@ paths:
                 properties:
                   error:
                     type: string
-        '500':
+        "500":
           description: Failed to fetch video data or YouTube API key not configured
           content:
             application/json:

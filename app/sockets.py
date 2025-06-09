@@ -19,7 +19,7 @@ def _handle_user_departure(socketio, room_id, uid):
     if uid in room.current_users:
         room.remove_user(uid)
         print(f"User {uid} removed from room {room_id}.")
-        socketio.emit("user_left", {"uid": uid, "room_id": room_id}, room=room_id)
+        socketio.emit("user_left", {"uid": uid}, room=room_id)
 
         if not room.current_users: # Room became empty
             if room_id in rooms: del rooms[room_id]
@@ -35,7 +35,7 @@ def _assign_new_host(socketio, room):
         new_host_user = users.get(new_host_uid)
         new_host_username = new_host_user.username if new_host_user else "Unknown user"
         print(f"User {new_host_username} (uid: {new_host_uid}) is now the host of room {room.id}.")
-        socketio.emit("host_changed", {"room_id": room.id, "new_host_uid": new_host_uid}, room=room.id)
+        socketio.emit("host_changed", {"new_host_uid": new_host_uid}, room=room.id)
     else: # Should ideally not be reached if called after checking room.current_users
         if room.id in rooms: del rooms[room.id]
         print(f"Room {room.id} deleted as it became empty during host reassignment.")
