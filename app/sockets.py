@@ -2,6 +2,7 @@ from flask_socketio import join_room, leave_room
 from flask import request
 from . import rooms, users
 from app.utils import find_room
+import random
 
 sid_map = {}
 uid_map = {}
@@ -15,17 +16,18 @@ def register_socket_events(socketio):
     def on_disconnect():
         print(f"Client disconnected: {request.sid}")
         uid = uid_map.pop(request.sid, None)
-        sid = sid_map.pop(uid, None)
 
         if uid:
+            sid = sid_map.pop(uid, None)
             print(f"User {uid} (SID: {request.sid}) disconnected. Cleaning up their rooms.")
 
             for room_id_key in list(rooms.keys()):
                 room = find_room(rooms, room_id_key)
+
                 if room and uid in room.current_users:
                     room.remove_user(uid)
                     print(f"User {uid} removed from room {room_id_key} due to disconnect.")
-                    socketio.emit("user_left", {"uid": uid}, room=room_id_key)
+                    socketio.emit("user_left", {"uid": uid, "room_id": room_id_key}, room=str(room_id_key)) 
 
                     if len(room.current_users) == 0:
                         del rooms[room_id_key]
@@ -58,17 +60,25 @@ def register_socket_events(socketio):
         del uid_map[request.sid]
         leave_room(room_id)
 
+        print(f"{users[uid].username} left room {room_id}")
+        socketio.emit("user_left", {"uid": uid}, room=room_id)
+
         if find_room(rooms, room_id) != None:
             if uid in rooms[room_id].current_users:
                 rooms[room_id].current_users.remove(uid)
             if len(rooms[room_id].current_users) == 0:
                 del rooms[room_id]
                 print(f"Room {room_id} deleted due to no user")
+            elif rooms[room_id].host == uid:
+                new_host_uid = random.choice(rooms[room_id].current_users)
+                rooms[room_id].host = new_host_uid
+                new_host_uid = random.choice(rooms[room_id].current_users)
+                rooms[room_id].host = new_host_uid
+                print(f"User {users.get(new_host_uid).username} (uid: {new_host_uid}) is now the host of room {room_id}")
         else:
             print(f"Room {room_id} not found")
             
-        print(f"{users[uid].username} left room {room_id}")
-        socketio.emit("user_left", {"uid": uid}, room=room_id)
+        
 
 
     @socketio.on("send_message")
