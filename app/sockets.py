@@ -7,6 +7,41 @@ import random
 sid_map = {}
 uid_map = {}
 
+# ===== HELPER FUNCTIONS =====
+
+def _handle_user_departure(socketio, room_id, uid):
+    """Helper function to manage room state when a user departs."""
+    room = find_room(rooms, room_id)
+    if not room:
+        print(f"Room {room_id} not found during user {uid} departure.")
+        return
+
+    if uid in room.current_users:
+        room.remove_user(uid)
+        print(f"User {uid} removed from room {room_id}.")
+        socketio.emit("user_left", {"uid": uid, "room_id": room_id}, room=room_id)
+
+        if not room.current_users: # Room became empty
+            if room_id in rooms: del rooms[room_id]
+            print(f"Room {room_id} deleted as it became empty.")
+        elif room.host == uid: # Room not empty, and departing user was host
+            _assign_new_host(socketio, room)
+
+def _assign_new_host(socketio, room):
+    """Helper function to assign a new host if current users exist."""
+    if room.current_users:
+        new_host_uid = random.choice(room.current_users)
+        room.host = new_host_uid
+        new_host_user = users.get(new_host_uid)
+        new_host_username = new_host_user.username if new_host_user else "Unknown user"
+        print(f"User {new_host_username} (uid: {new_host_uid}) is now the host of room {room.id}.")
+        socketio.emit("host_changed", {"room_id": room.id, "new_host_uid": new_host_uid}, room=room.id)
+    else: # Should ideally not be reached if called after checking room.current_users
+        if room.id in rooms: del rooms[room.id]
+        print(f"Room {room.id} deleted as it became empty during host reassignment.")
+
+# ===== SOCKETS =====
+
 def register_socket_events(socketio):
     @socketio.on("connect")
     def on_connect():
@@ -25,13 +60,7 @@ def register_socket_events(socketio):
                 room = find_room(rooms, room_id_key)
 
                 if room and uid in room.current_users:
-                    room.remove_user(uid)
-                    print(f"User {uid} removed from room {room_id_key} due to disconnect.")
-                    socketio.emit("user_left", {"uid": uid}, room=room_id_key)
-
-                    if len(room.current_users) == 0:
-                        del rooms[room_id_key]
-                        print(f"Room {room_id_key} deleted as it became empty.")
+                    _handle_user_departure(socketio, room_id_key, uid)
         else:
             print(f"SID {request.sid} disconnected, no user mapping found or already cleaned up.")
 
@@ -61,22 +90,7 @@ def register_socket_events(socketio):
         leave_room(room_id)
 
         print(f"{users[uid].username} left room {room_id}")
-        socketio.emit("user_left", {"uid": uid}, room=room_id)
-
-        if find_room(rooms, room_id) != None:
-            if uid in rooms[room_id].current_users:
-                rooms[room_id].current_users.remove(uid)
-            if len(rooms[room_id].current_users) == 0:
-                del rooms[room_id]
-                print(f"Room {room_id} deleted due to no user")
-            elif rooms[room_id].host == uid:
-                new_host_uid = random.choice(rooms[room_id].current_users)
-                rooms[room_id].host = new_host_uid
-                new_host_uid = random.choice(rooms[room_id].current_users)
-                rooms[room_id].host = new_host_uid
-                print(f"User {users.get(new_host_uid).username} (uid: {new_host_uid}) is now the host of room {room_id}")
-        else:
-            print(f"Room {room_id} not found")
+        _handle_user_departure(socketio, room_id, uid)
             
         
 
