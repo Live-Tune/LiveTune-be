@@ -9,11 +9,29 @@ uid_map = {}
 def register_socket_events(socketio):
     @socketio.on("connect")
     def on_connect():
-        print("Client connected")
+        print(f"Client connected: sid={request.sid}")
 
     @socketio.on("disconnect")
     def on_disconnect():
-        print("Client disconnected")
+        print(f"Client disconnected: {request.sid}")
+        uid = uid_map.pop(request.sid, None)
+        sid = sid_map.pop(uid, None)
+
+        if uid:
+            print(f"User {uid} (SID: {request.sid}) disconnected. Cleaning up their rooms.")
+
+            for room_id_key in list(rooms.keys()):
+                room = find_room(rooms, room_id_key)
+                if room and uid in room.current_users:
+                    room.remove_user(uid)
+                    print(f"User {uid} removed from room {room_id_key} due to disconnect.")
+                    socketio.emit("user_left", {"uid": uid}, room=room_id_key)
+
+                    if len(room.current_users) == 0:
+                        del rooms[room_id_key]
+                        print(f"Room {room_id_key} deleted as it became empty.")
+        else:
+            print(f"SID {request.sid} disconnected, no user mapping found or already cleaned up.")
 
     @socketio.on("join_room")
     def on_join(data):
