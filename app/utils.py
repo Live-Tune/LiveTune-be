@@ -2,8 +2,11 @@ from flask import jsonify
 import time
 from threading import Thread
 from . import users, rooms
+from .logger_config import get_logger
 
 TTL_SECONDS = 3600  # 1 hour
+
+logger = get_logger(__name__) 
 
 def find_room(rooms: dict, id: int):
     """
@@ -43,7 +46,7 @@ def cleanup_inactive_users():
             expired_uids.append(uid)
 
     for uid in expired_uids:
-        print(f"Removing inactive user: {users[uid].username}")
+        logger.info(f"Removing inactive user: {users[uid].username}")
         del users[uid]
 
 def start_cleanup():
