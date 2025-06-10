@@ -1,10 +1,9 @@
 from flask import jsonify
 import time
 from threading import Thread
-from . import users, rooms
 from .logger_config import get_logger
 
-TTL_SECONDS = 3600  # 1 hour
+TTL_SECONDS = 3600 * 12  # 12 hour
 
 logger = get_logger(__name__) 
 
@@ -52,7 +51,7 @@ def cleanup_inactive_users(users, rooms):
 def start_cleanup(users, rooms):
     def run():
         while True:
-            print("Clean up")
+            logger.info("Starting user cleanup process")
             cleanup_inactive_users(users, rooms)
-            time.sleep(TTL_SECONDS)  # Run once per hour
+            time.sleep(TTL_SECONDS)
     Thread(target=run, daemon=True).start()
