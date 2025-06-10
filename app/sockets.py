@@ -131,5 +131,5 @@ def register_socket_events(socketio):
             case "ping":
                 socketio.emit("pong", {}, to=request.sid)
             case _:
-                logger.warning("Wrong control signal")
+                logger.warning(f"Invalid control signal received: '{message_type}' from SID: {request.sid} in Room ID: {room_id}")
 

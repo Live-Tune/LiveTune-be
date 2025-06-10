@@ -34,7 +34,7 @@ def createroom():
     rooms[next_room_id] = Room(data, id=next_room_id)
     next_room_id += 1
 
-    logger.info("Room created successfully.")
+    logger.info(f"Room created successfully. Room ID: {next_room_id - 1}, Host UID: {data.get('host')}")
     return jsonify({"id": (next_room_id - 1)}), 201
 
 
@@ -57,7 +57,7 @@ def updatesettings():
 
     rooms[id].update_settings(data)
 
-    logger.info("Room updated successfully.")
+    logger.info(f"Room settings updated. Room ID: {id}, Updated Fields: {data}")
     return jsonify({"message": "Room updated successfully"}), 200
 
 # Retrieve available public rooms
@@ -160,7 +160,7 @@ def create_user():
     uid = str(uuid.uuid4())
     users[uid] = User(username, uid)
 
-    logger.info("User created successfully.")
+    logger.info(f"User created successfully. Username: {username}, UID: {uid}")
     return jsonify({"uid": (uid)}), 201
 
 
@@ -180,7 +180,7 @@ def update_username():
     else:
         return jsonify({"error": "User not found"}), 404
 
-    logger.info("Username updated successfully.")
+    logger.info(f"Username updated successfully. UID: {uid}, New Username: {username}")
     return jsonify({"message": "Username updated successfully"}), 200
 
 # User info
