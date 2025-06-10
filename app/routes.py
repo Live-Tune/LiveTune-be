@@ -7,7 +7,9 @@ import uuid
 import requests 
 import os
 from env import YOUTUBE_API_KEY
+from app.logger_config import get_logger
 
+logger = get_logger(__name__)
 from . import rooms, users
 next_room_id = 1 # id is just a counter now
 
@@ -32,7 +34,7 @@ def createroom():
     rooms[next_room_id] = Room(data, id=next_room_id)
     next_room_id += 1
 
-    print("Room created successfully.") # testing purposes
+    logger.info("Room created successfully.")
     return jsonify({"id": (next_room_id - 1)}), 201
 
 
@@ -55,7 +57,7 @@ def updatesettings():
 
     rooms[id].update_settings(data)
 
-    print("Room updated successfully.") # testing purposes
+    logger.info("Room updated successfully.")
     return jsonify({"message": "Room updated successfully"}), 200
 
 # Retrieve available public rooms
@@ -158,7 +160,7 @@ def create_user():
     uid = str(uuid.uuid4())
     users[uid] = User(username, uid)
 
-    print("User created successfully.") # testing purposes
+    logger.info("User created successfully.")
     return jsonify({"uid": (uid)}), 201
 
 
@@ -178,7 +180,7 @@ def update_username():
     else:
         return jsonify({"error": "User not found"}), 404
 
-    print("Username updated successfully.") # testing purposes
+    logger.info("Username updated successfully.")
     return jsonify({"message": "Username updated successfully"}), 200
 
 # User info
