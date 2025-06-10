@@ -81,7 +81,7 @@ def deleteroom():
         room_id = int(request.args.get('room_id'))
         uid = request.args.get('uid')
     except ValueError:
-        return jsonify({"message": "Query parameter 'id' must be an integer"}), 400
+        return jsonify({"message": "Query parameter 'room_id' must be an integer"}), 400
 
     room_to_delete = find_room(rooms, room_id)
     
@@ -90,8 +90,8 @@ def deleteroom():
         if room_to_delete.host != uid:
             return jsonify({"message": "User not host, cannot delete room"}), 400
         
-        rooms[id].current_users.clear()
-        del rooms[id]
+        rooms[room_id].current_users.clear()
+        del rooms[room_id]
         return jsonify({"message": "Room deleted successfully"}), 200
     else:
         return jsonify({"message": "Room not found"}), 404
