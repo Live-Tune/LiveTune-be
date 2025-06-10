@@ -6,13 +6,10 @@ from app.utils import *
 import uuid
 import requests 
 import os
+from env import YOUTUBE_API_KEY
 
 from . import rooms, users
 next_room_id = 1 # id is just a counter now
-
-YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")  
-# retrieving api key for youtube data api
-# environment variable for sapi key needs to be set
 
 api_bp = Blueprint('api', __name__, url_prefix='/api') 
 # this is so that we can "attach" the routes to the app instance
@@ -123,9 +120,11 @@ def get_room_info():
         filtered = {
             "name": room_data.get("name"),
             "description": room_data.get("description"),
-            "current_users_number": len(room_data.get("current_users_number", [])),
+            "current_users": room_data.get("current_users"),
             "max_user": room_data.get("max_user"),
             "host": room_data.get("host"),
+            "queue": room_data.get("queue"),
+            "current_song": room_data.get("current_song")
         }
         return jsonify(filtered), 200
     

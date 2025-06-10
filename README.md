@@ -2,7 +2,7 @@
 
 ## Description
 
-**LiveTune-be** is the backend server for the [LiveTune](https://github.com/GLSO0415-Team1/LiveTune) project—an open-source, web-based music streaming app that allows users to enjoy real-time music together using YouTube links. The backend handles room creation, user sessions, and core logic for live interactions.
+**LiveTune-be** is the backend server for the [LiveTune](https://github.com/Live-Tune) project—an open-source, web-based music streaming app that allows users to enjoy real-time music together using YouTube links. The backend handles room creation, user sessions, and core logic for live interactions.
 
 ## Features
 
@@ -24,7 +24,7 @@
 
 ### Prerequisites
 
-Make sure you have Python 3.8+ installed.
+Make sure you have Python 3.9+ installed.
 
 ### Installation
 
@@ -57,29 +57,11 @@ python run.py
 
 ## API Documentation
 
-- The OpenAPI specification is available at `openapi.yaml`.
+- The OpenAPI specification is available at [`openapi.yaml`](./docs/openapi.yaml).
 
 ## Contributing
 
-We welcome contributions! Here's how to get started:
 
-1. Fork this repository.
-2. Create a new branch for your changes:
+We welcome contributions! Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) guide for detailed instructions on how to get involved.
 
-```bash
-git checkout -b feature/your-feature-name
-```
-
-3. Commit your changes with a descriptive message:
-
-```bash
-git commit -m "feat: add <your feature>"
-```
-
-4. Push to your fork:
-
-```bash
-git push origin feature/your-feature-name
-```
-
-5. Open a Pull Request targeting the `main` or `develop` branch.
+If you're new to the project, check out the issues labeled [`good first issue`](https://github.com/Live-Tune/LiveTune-be/labels/good%20first%20issue) to get started.
