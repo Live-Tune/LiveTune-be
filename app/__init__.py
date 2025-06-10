@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from .utils import start_cleanup
 
 rooms = {}
 users = {}
@@ -21,5 +22,7 @@ def create_app(config_object=None):
     socketio.init_app(app)
     from .sockets import register_socket_events
     register_socket_events(socketio)
+
+    start_cleanup(users, rooms)     # Start the background TTL cleanup thread
 
     return app

@@ -1,3 +1,5 @@
+import time
+
 class Room:
 
     def __init__(self, data, id):
@@ -50,6 +52,7 @@ class User:
     def __init__(self, username, uid):
         self.username = username
         self.uid = uid
+        self.last_active = time.time()
 
     def to_dict(self):
         return {
