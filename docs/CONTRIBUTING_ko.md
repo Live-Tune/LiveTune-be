@@ -119,9 +119,11 @@ LiveTune-be
 │   ├── dockerImageLoad.bat
 │   ├── dockerImageSave.bat
 │   └── dockerRun.bat
+├── docs/
+│   ├── CONTRIBUTING_ko.md
+│   └── openapi.yaml # API 문서
 ├── .gitignore
 ├── env.py              # 환경변수 (버전 관리 제외 대상)
-├── openapi.yaml        # API 문서
 ├── requirements.txt    # Python 패키지 의존성 목록
 ├── run.py              # 개발 서버 실행 스크립트
 └── README.md           # 프로젝트 소개

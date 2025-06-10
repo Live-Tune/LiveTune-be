@@ -115,9 +115,11 @@ LiveTune-be
 │   ├── dockerImageLoad.bat
 │   ├── dockerImageSave.bat
 │   └── dockerRun.bat
+├── docs/
+│   ├── CONTRIBUTING_ko.md
+│   └── openapi.yaml # API documentation
 ├── .gitignore
 ├── env.py              # Environment variables (should be in .gitignore)
-├── openapi.yaml # Routes documentation
 ├── requirements.txt    # Python package dependencies
 ├── run.py              # Script to run the development 
 └── README.md           # Project README
