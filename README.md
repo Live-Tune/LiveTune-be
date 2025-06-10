@@ -24,7 +24,7 @@
 
 ### Prerequisites
 
-Make sure you have Python 3.8+ installed.
+Make sure you have Python 3.9+ installed.
 
 ### Installation
 
@@ -57,7 +57,7 @@ python run.py
 
 ## API Documentation
 
-- The OpenAPI specification is available at `openapi.yaml`.
+- The OpenAPI specification is available at [`openapi.yaml`](./docs/openapi.yaml).
 
 ## Contributing
 
