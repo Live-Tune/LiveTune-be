@@ -1,7 +1,6 @@
 from flask import jsonify
 import time
 from threading import Thread
-from . import users, rooms
 
 TTL_SECONDS = 3600  # 1 hour
 
@@ -21,7 +20,7 @@ def find_user(users: dict, id):
     if id in users:
         return users.get(id)
     
-def is_user_in_room(uid):
+def is_user_in_room(rooms, uid):
     """
     Checks if user is in a room
     """
@@ -30,7 +29,7 @@ def is_user_in_room(uid):
             return True
     return False
     
-def cleanup_inactive_users():
+def cleanup_inactive_users(users, rooms):
     """
     Finds and deletes users that has not been in a room for 1 hour or more
     """
@@ -39,16 +38,17 @@ def cleanup_inactive_users():
     expired_uids = []
 
     for uid, user in list(users.items()):
-        if not is_user_in_room(uid) and (now - user.last_active) > TTL_SECONDS:
+        if not is_user_in_room(rooms, uid) and (now - user.last_active) > TTL_SECONDS:
             expired_uids.append(uid)
 
     for uid in expired_uids:
-        print(f"Removing inactive user: {users[uid].username}")
+        print(f"Removing inactive user: {users[uid].username}(uid:{uid})")
         del users[uid]
 
-def start_cleanup():
+def start_cleanup(users, rooms):
     def run():
         while True:
-            cleanup_inactive_users()
-            time.sleep(3600)  # Run once per hour
+            print("Clean up")
+            cleanup_inactive_users(users, rooms)
+            time.sleep(TTL_SECONDS)  # Run once per hour
     Thread(target=run, daemon=True).start()

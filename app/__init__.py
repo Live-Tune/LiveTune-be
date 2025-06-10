@@ -23,6 +23,6 @@ def create_app(config_object=None):
     from .sockets import register_socket_events
     register_socket_events(socketio)
 
-    start_cleanup()     # Start the background TTL cleanup thread
+    start_cleanup(users, rooms)     # Start the background TTL cleanup thread
 
     return app
