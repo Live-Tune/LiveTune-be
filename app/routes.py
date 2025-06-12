@@ -8,6 +8,7 @@ import requests
 import os
 from env import YOUTUBE_API_KEY
 from app.logger_config import get_logger
+from yt_dlp import YoutubeDL
 
 logger = get_logger(__name__)
 from . import rooms, users
@@ -225,3 +226,32 @@ def get_youtube_title():
 
     title = items[0]["snippet"]["title"]
     return jsonify({"title": title}), 200
+
+@api_bp.route("/playlist/fetch", methods=["POST"])
+def fetch_playlist():
+
+    data = request.get_json()
+    url = data.get("url")
+
+    if not url:
+        return jsonify({"error": "No playlist URL provided"}), 400
+
+    ydl_opts = {
+        'quiet': True,
+        'extract_flat': True,
+        'force_generic_extractor': True,
+    }
+
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            entries = info_dict.get('entries', [])
+            result = [
+                {
+                    "title": entry.get("title"),
+                    "youtube_id": entry.get("id")
+                } for entry in entries if entry.get("id")
+            ]
+        return jsonify({"videos": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
