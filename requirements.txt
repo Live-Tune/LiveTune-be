@@ -3,3 +3,4 @@ flask-socketio
 Flask-CORS
 gunicorn
 requests
+yt_dlp
