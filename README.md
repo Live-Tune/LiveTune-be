@@ -49,7 +49,15 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Run the application**
+4. **Create an environment configuration**
+
+In the root folder, create a file named `env.py` and insert your YouTube Data API key like this:
+
+```python
+YOUTUBE_API_KEY = "your_api_key_here"
+```
+
+5. **Run the application**
 
 ```bash
 python run.py
