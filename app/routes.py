@@ -8,7 +8,6 @@ import requests
 import os
 from env import YOUTUBE_API_KEY
 from app.logger_config import get_logger
-from yt_dlp import YoutubeDL
 
 logger = get_logger(__name__)
 from . import rooms, users
@@ -229,29 +228,36 @@ def get_youtube_title():
 
 @api_bp.route("/playlist/fetch", methods=["POST"])
 def fetch_playlist():
-
     data = request.get_json()
-    url = data.get("url")
+    playlist_id = data.get("playlistId")
+    if not playlist_id:
+        return jsonify({"error": "Missing playlistId"}), 400
 
-    if not url:
-        return jsonify({"error": "No playlist URL provided"}), 400
+    url = (
+        f"https://www.googleapis.com/youtube/v3/playlistItems"
+        f"?part=snippet&maxResults=50&playlistId={playlist_id}&key={YOUTUBE_API_KEY}"
+    )
+    items = []
 
-    ydl_opts = {
-        'quiet': True,
-        'extract_flat': True,
-        'force_generic_extractor': True,
-    }
+    while url:
+        res = requests.get(url)
+        if res.status_code != 200:
+            return jsonify({"error": "Failed to fetch playlist items"}), 500
+        data = res.json()
+        for item in data.get("items", []):
+            snippet = item["snippet"]
+            title = snippet.get("title", "")
+            if title.strip() in ["Deleted video", "Private video"]:
+                continue
+            video_id = snippet["resourceId"]["videoId"]
+            items.append({"title": snippet["title"], "youtube_id": video_id})
+        token = data.get("nextPageToken")
+        if token:
+            url = (
+                f"https://www.googleapis.com/youtube/v3/playlistItems"
+                f"?part=snippet&maxResults=50&playlistId={playlist_id}&pageToken={token}&key={YOUTUBE_API_KEY}"
+            )
+        else:
+            break
 
-    try:
-        with YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=False)
-            entries = info_dict.get('entries', [])
-            result = [
-                {
-                    "title": entry.get("title"),
-                    "youtube_id": entry.get("id")
-                } for entry in entries if entry.get("id")
-            ]
-        return jsonify({"videos": result}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"videos": items}), 200
