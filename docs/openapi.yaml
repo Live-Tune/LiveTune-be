@@ -586,3 +586,53 @@ paths:
                 properties:
                   error:
                     type: string
+  /api/video/getplaylist:
+    get:
+      tags:
+        - Videos
+      summary: Fetch YouTube playlist videos
+      description: Returns a list of video titles and IDs from a given YouTube playlist.
+      parameters:
+        - name: playlistid
+          in: query
+          required: true
+          description: The ID of the YouTube playlist to fetch.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of videos in the playlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  videos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                          description: The title of the video
+                        youtube_id:
+                          type: string
+                          description: The YouTube video ID
+        "400":
+          description: Bad request - missing or invalid playlistid parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error - failed to fetch playlist items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string

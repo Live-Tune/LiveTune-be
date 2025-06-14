@@ -111,6 +111,11 @@ def register_socket_events(socketio):
                 socketio.emit("broadcast_play", {}, room=room_id, include_self=False)
             case "pause":
                 socketio.emit("broadcast_pause", {}, room=room_id, include_self=False)
+            case "add_playlist":
+                videos = data.get("videos")  # List of {title, youtube_id, added_by}
+                for video in videos:
+                    rooms[room_id].queue.append(video)
+                socketio.emit("broadcast_add_playlist", {"videos": videos}, room=room_id, include_self=False)
             case "sync":
                 timestamp = data.get("timestamp");
                 socketio.emit("broadcast_sync", {"timestamp": timestamp}, room=room_id, include_self=False)
@@ -132,4 +137,5 @@ def register_socket_events(socketio):
                 socketio.emit("pong", {}, to=request.sid)
             case _:
                 logger.warning(f"Invalid control signal received: '{message_type}' from SID: {request.sid} in Room ID: {room_id}")
+                
 
