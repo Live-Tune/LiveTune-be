@@ -226,10 +226,9 @@ def get_youtube_title():
     title = items[0]["snippet"]["title"]
     return jsonify({"title": title}), 200
 
-@api_bp.route("/playlist/fetch", methods=["POST"])
+@api_bp.route("/video/getplaylist", methods=["GET"])
 def fetch_playlist():
-    data = request.get_json()
-    playlist_id = data.get("playlistId")
+    playlist_id = request.args.get("playlistid")
     if not playlist_id:
         return jsonify({"error": "Missing playlistId"}), 400
 
